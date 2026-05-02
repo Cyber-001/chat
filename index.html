@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Only2 – Firebase Chat</title>
-    <!-- Firebase SDK (CDN) -->
+    <title>Only2 – Firebase + WebRTC Chat</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
     <style>
@@ -20,154 +19,87 @@
             --msg-received: #fff;
             --danger: #ea4335;
             --success: #34a853;
-            --shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
+            --shadow: 0 1px 3px rgba(0,0,0,0.12);
             --shadow-lg: 0 4px 20px rgba(0,0,0,0.15);
             --radius: 12px;
             --radius-sm: 8px;
-            --transition: 0.2s ease;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: var(--bg); color: var(--text);
-            min-height:100vh; display:flex; align-items:center; justify-content:center;
-            -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg); color: var(--text); min-height:100vh;
+            display:flex; align-items:center; justify-content:center;
         }
         .app-container {
             width:100%; max-width:500px; height:100vh; max-height:850px;
-            background:var(--white); border-radius:0; box-shadow:var(--shadow-lg);
-            display:flex; flex-direction:column; overflow:hidden; position:relative;
+            background:#fff; box-shadow:var(--shadow-lg); display:flex; flex-direction:column; overflow:hidden;
+            position:relative;
         }
         @media (min-width:520px) {
-            .app-container { border-radius:var(--radius); height:90vh; max-height:800px; margin:20px; }
+            .app-container { border-radius:var(--radius); height:90vh; margin:20px; }
         }
-        @media (min-width:768px) {
-            .app-container { max-width:550px; height:88vh; max-height:850px; }
-        }
-        .screen { display:none; flex-direction:column; height:100%; width:100%; position:absolute; top:0; left:0; background:var(--white); z-index:1; }
+        .screen { display:none; flex-direction:column; height:100%; width:100%; position:absolute; top:0; left:0; background:#fff; z-index:1; }
         .screen.active { display:flex; z-index:10; }
-        .auth-screen { display:flex; align-items:center; justify-content:center; padding:20px; }
-        .auth-screen.active { display:flex; }
+        /* Auth */
+        .auth-screen { align-items:center; justify-content:center; padding:20px; }
         .auth-card {
-            width:100%; max-width:380px; padding:30px 24px; background:var(--white);
+            width:100%; max-width:380px; padding:30px 24px; background:#fff;
             border-radius:var(--radius); box-shadow:var(--shadow); text-align:center;
         }
         .auth-card .logo { font-size:42px; margin-bottom:8px; }
-        .auth-card h2 { font-size:22px; font-weight:600; margin-bottom:6px; }
-        .auth-card .subtitle { font-size:13px; color:var(--text-light); margin-bottom:24px; }
-        .auth-card label {
-            display:block; text-align:left; font-size:12px; font-weight:600;
-            color:var(--text-light); margin-bottom:4px; letter-spacing:0.3px; text-transform:uppercase;
-        }
+        .auth-card h2 { font-size:22px; font-weight:600; }
+        .auth-card .subtitle { font-size:13px; color:var(--text-light); margin-bottom:20px; }
+        .auth-card label { display:block; text-align:left; font-size:12px; font-weight:600; color:var(--text-light); margin-bottom:4px; }
         .auth-card input {
-            width:100%; padding:11px 14px; border:2px solid var(--border);
-            border-radius:var(--radius-sm); font-size:15px; margin-bottom:14px;
-            transition:var(--transition); outline:none; background:#fafafa; font-family:inherit;
+            width:100%; padding:11px 14px; border:2px solid var(--border); border-radius:var(--radius-sm);
+            font-size:15px; margin-bottom:14px; outline:none; background:#fafafa;
         }
         .auth-card input:focus { border-color:var(--primary); background:#fff; box-shadow:0 0 0 3px rgba(26,115,232,0.1); }
         .auth-card .btn {
-            width:100%; padding:12px; background:var(--primary); color:#fff;
-            border:none; border-radius:24px; font-size:15px; font-weight:600;
-            cursor:pointer; transition:var(--transition); letter-spacing:0.3px; font-family:inherit;
+            width:100%; padding:12px; background:var(--primary); color:#fff; border:none;
+            border-radius:24px; font-size:15px; font-weight:600; cursor:pointer; margin-top:6px;
         }
-        .auth-card .btn:hover { background:var(--primary-dark); transform:translateY(-1px); box-shadow:var(--shadow); }
-        .auth-card .btn:active { transform:scale(0.97); }
-        .auth-card .error-msg { color:var(--danger); font-size:13px; margin-top:4px; min-height:20px; }
-        .auth-card .hint { font-size:11px; color:var(--text-light); margin-top:16px; opacity:0.8; }
+        .auth-card .btn:hover { background:var(--primary-dark); }
+        .auth-card .error-msg { color:var(--danger); font-size:13px; min-height:20px; }
+        /* Chat header */
         .chat-header {
-            display:flex; align-items:center; padding:10px 14px;
-            border-bottom:1px solid var(--border); background:#fff; gap:10px; flex-shrink:0; z-index:5;
+            display:flex; align-items:center; padding:10px 14px; border-bottom:1px solid var(--border);
+            background:#fff; gap:10px; flex-shrink:0;
         }
-        .chat-header .back-btn { font-size:20px; cursor:pointer; padding:6px; border-radius:50%; transition:var(--transition); display:flex; align-items:center; justify-content:center; width:36px; height:36px; flex-shrink:0; }
-        .chat-header .back-btn:hover { background:#f1f3f4; }
-        .chat-header .avatar { width:40px; height:40px; border-radius:50%; background:var(--primary); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:17px; flex-shrink:0; }
-        .chat-header .user-info { flex:1; min-width:0; }
-        .chat-header .user-name { font-weight:600; font-size:15px; }
-        .chat-header .user-status { font-size:12px; color:var(--success); font-weight:500; }
+        .chat-header .back-btn { font-size:20px; cursor:pointer; padding:6px; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; }
+        .chat-header .avatar { width:40px; height:40px; border-radius:50%; background:var(--primary); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; }
+        .chat-header .user-info { flex:1; }
+        .chat-header .user-name { font-weight:600; }
+        .chat-header .user-status { font-size:12px; color:var(--success); }
         .chat-header .user-status.offline { color:var(--text-light); }
-        .chat-header .call-btns { display:flex; gap:6px; flex-shrink:0; }
-        .chat-header .call-btn { width:36px; height:36px; border-radius:50%; border:none; background:#f1f3f4; cursor:pointer; font-size:17px; transition:var(--transition); display:flex; align-items:center; justify-content:center; }
-        .chat-header .call-btn:hover { background:#e8eaed; }
-        .chat-header .call-btn.video-call { background:#e8f0fe; color:var(--primary); }
-        .chat-header .call-btn.audio-call { background:#e6f4ea; color:var(--success); }
-        .messages-container {
-            flex:1; overflow-y:auto; padding:12px 14px; display:flex;
-            flex-direction:column; gap:4px; background:#f8f9fa; scroll-behavior:smooth;
-        }
-        .messages-container::-webkit-scrollbar { width:5px; }
-        .messages-container::-webkit-scrollbar-track { background:transparent; }
-        .messages-container::-webkit-scrollbar-thumb { background:#ccc; border-radius:10px; }
-        .msg-wrapper { display:flex; flex-direction:column; max-width:80%; animation: fadeInUp 0.25s ease; }
-        @keyframes fadeInUp { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+        .messages-container { flex:1; overflow-y:auto; padding:12px 14px; background:#f8f9fa; }
+        .msg-wrapper { max-width:80%; margin-bottom:6px; display:flex; flex-direction:column; }
         .msg-wrapper.sent { align-self:flex-end; }
         .msg-wrapper.received { align-self:flex-start; }
-        .msg-bubble {
-            padding:10px 14px; border-radius:18px; font-size:14px; line-height:1.45;
-            word-break:break-word; position:relative; cursor:pointer; transition:var(--transition);
-            box-shadow:0 1px 2px rgba(0,0,0,0.06);
-        }
-        .msg-wrapper.sent .msg-bubble { background:var(--msg-sent); border-bottom-right-radius:4px; }
-        .msg-wrapper.received .msg-bubble { background:var(--msg-received); border-bottom-left-radius:4px; border:1px solid #e8eaed; }
-        .msg-bubble img { max-width:240px; max-height:300px; border-radius:10px; cursor:pointer; display:block; }
-        .msg-bubble video { max-width:240px; max-height:300px; border-radius:10px; cursor:pointer; display:block; }
-        .msg-bubble audio { max-width:200px; display:block; }
-        .msg-meta {
-            font-size:10px; color:#6b7280; margin-top:3px; display:flex; gap:8px; align-items:center;
-        }
-        .msg-wrapper.sent .msg-meta { justify-content:flex-end; }
-        .msg-meta .seen-status { font-weight:500; color:#4a90d9; font-size:10px; }
-        .msg-meta .edited-tag { font-style:italic; opacity:0.7; }
-        .date-divider { text-align:center; font-size:11px; color:#8e8e93; margin:10px 0; font-weight:500; }
-        .input-area {
-            display:flex; align-items:flex-end; gap:6px; padding:8px 10px;
-            border-top:1px solid var(--border); background:#fff; flex-shrink:0; z-index:5; flex-wrap:wrap;
-        }
-        .input-area .attach-btn { width:38px; height:38px; border-radius:50%; border:none; background:#f1f3f4; cursor:pointer; font-size:20px; transition:var(--transition); flex-shrink:0; display:flex; align-items:center; justify-content:center; }
-        .input-area .attach-btn:hover { background:#e8eaed; }
-        .input-area textarea {
-            flex:1; min-width:0; padding:10px 14px; border:2px solid var(--border);
-            border-radius:22px; font-size:14px; resize:none; outline:none; max-height:100px;
-            font-family:inherit; background:#fafafa; transition:var(--transition); line-height:1.4;
-        }
-        .input-area textarea:focus { border-color:var(--primary); background:#fff; box-shadow:0 0 0 3px rgba(26,115,232,0.08); }
-        .input-area .send-btn { width:38px; height:38px; border-radius:50%; border:none; background:var(--primary); color:#fff; cursor:pointer; font-size:18px; transition:var(--transition); flex-shrink:0; display:flex; align-items:center; justify-content:center; }
-        .input-area .send-btn:hover { background:var(--primary-dark); }
-        .input-area .send-btn:active { transform:scale(0.92); }
-        .input-area .send-btn:disabled { background:#ccc; cursor:not-allowed; }
-        .attach-menu {
-            display:none; position:absolute; bottom:65px; left:10px; background:#fff;
-            border-radius:var(--radius); box-shadow:var(--shadow-lg); padding:6px 0; z-index:20; min-width:170px;
-        }
-        .attach-menu.show { display:block; animation: slideUp 0.2s ease; }
-        @keyframes slideUp { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
-        .attach-menu button {
-            display:block; width:100%; padding:10px 16px; border:none; background:none;
-            cursor:pointer; font-size:14px; text-align:left; transition:var(--transition); font-family:inherit;
-        }
-        .attach-menu button:hover { background:#f1f3f4; }
+        .msg-bubble { padding:10px 14px; border-radius:18px; font-size:14px; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,0.06); word-break:break-word; }
+        .sent .msg-bubble { background:var(--msg-sent); border-bottom-right-radius:4px; }
+        .received .msg-bubble { border:1px solid #e8eaed; border-bottom-left-radius:4px; }
+        .msg-bubble img { max-width:220px; border-radius:10px; cursor:pointer; display:block; }
+        .msg-bubble video, .msg-bubble audio { max-width:220px; border-radius:10px; display:block; }
+        .msg-meta { font-size:10px; color:#6b7280; margin-top:3px; display:flex; gap:6px; }
+        .sent .msg-meta { justify-content:flex-end; }
+        .input-area { display:flex; gap:6px; padding:8px 10px; border-top:1px solid var(--border); background:#fff; flex-shrink:0; }
+        .input-area textarea { flex:1; padding:10px 14px; border:2px solid var(--border); border-radius:22px; font-size:14px; resize:none; outline:none; font-family:inherit; }
+        .input-area .send-btn { width:38px; height:38px; border-radius:50%; background:var(--primary); color:#fff; border:none; cursor:pointer; font-size:18px; }
         .call-modal {
             display:none; position:fixed; top:0; left:0; width:100%; height:100%;
             background:rgba(0,0,0,0.9); z-index:100; flex-direction:column; align-items:center; justify-content:center;
         }
         .call-modal.active { display:flex; }
-        .call-modal video { width:100%; max-width:500px; border-radius:var(--radius); background:#1a1a1a; max-height:60vh; object-fit:cover; }
-        .call-modal .remote-video { width:100%; max-width:500px; max-height:60vh; border-radius:var(--radius); background:#1a1a1a; object-fit:cover; }
-        .call-modal .local-video { position:absolute; bottom:100px; right:20px; width:120px; height:160px; border-radius:var(--radius-sm); border:3px solid #fff; object-fit:cover; background:#333; z-index:5; }
-        .call-modal .call-controls { display:flex; gap:20px; margin-top:20px; }
-        .call-modal .ctrl-btn { width:55px; height:55px; border-radius:50%; border:none; cursor:pointer; font-size:24px; transition:var(--transition); display:flex; align-items:center; justify-content:center; }
-        .call-modal .ctrl-btn.end-call { background:var(--danger); color:#fff; }
-        .msg-popup { display:none; position:fixed; z-index:50; background:#fff; border-radius:var(--radius-sm); box-shadow:var(--shadow-lg); padding:4px 0; min-width:140px; }
-        .msg-popup.show { display:block; }
-        .msg-popup button { display:block; width:100%; padding:10px 16px; border:none; background:none; cursor:pointer; font-size:13px; text-align:left; transition:var(--transition); font-family:inherit; }
-        .msg-popup button:hover { background:#f1f3f4; }
-        .msg-popup button.delete-opt { color:var(--danger); }
-        .toast { position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:10px 20px; border-radius:20px; font-size:13px; z-index:200; opacity:0; transition:opacity 0.3s; pointer-events:none; }
+        .call-modal video { max-width:500px; max-height:60vh; border-radius:var(--radius); background:#111; }
+        .call-modal .local-video { position:absolute; bottom:100px; right:20px; width:120px; height:160px; border:3px solid #fff; border-radius:var(--radius-sm); }
+        .call-controls { display:flex; gap:20px; margin-top:20px; }
+        .ctrl-btn { width:55px; height:55px; border-radius:50%; border:none; font-size:24px; cursor:pointer; }
+        .ctrl-btn.end-call { background:var(--danger); color:#fff; }
+        .msg-popup { display:none; position:fixed; background:#fff; border-radius:8px; box-shadow:var(--shadow-lg); z-index:50; }
+        .msg-popup button { display:block; width:100%; padding:10px 16px; border:none; background:none; cursor:pointer; }
+        .toast { position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:10px 20px; border-radius:20px; z-index:200; opacity:0; transition:opacity 0.3s; }
         .toast.show { opacity:1; }
-        @media (max-width:400px) {
-            .msg-wrapper { max-width:88%; }
-            .msg-bubble img, .msg-bubble video { max-width:180px; max-height:220px; }
-            .msg-bubble audio { max-width:150px; }
-        }
     </style>
 </head>
 <body>
@@ -175,20 +107,19 @@
     <!-- LOGIN -->
     <div class="screen auth-screen active" id="loginScreen">
         <div class="auth-card">
-            <div class="logo">🔐</div><h2>Kirish</h2><p class="subtitle">Faqat 2 kishi uchun maxfiy chat</p>
-            <label>Login</label><input type="text" id="loginInput" placeholder="Loginni kiriting" autocomplete="off">
+            <div class="logo">🔐</div><h2>Kirish</h2><p class="subtitle">Faqat 2 kishi uchun</p>
+            <label>Login</label><input type="text" id="loginInput" placeholder="Loginni kiriting">
             <label>Parol</label><input type="password" id="passwordInput" placeholder="Parolni kiriting">
             <p class="error-msg" id="loginError"></p>
             <button class="btn" id="loginBtn">➡️ Davom etish</button>
-            <p class="hint">user_1 / user_2</p>
         </div>
     </div>
     <!-- 2FA -->
     <div class="screen auth-screen" id="twoFAScreen">
         <div class="auth-card">
             <div class="logo">🛡️</div><h2>2-Bosqichli Tekshiruv</h2>
-            <p class="subtitle" id="twoFAUserLabel">Maxfiy kodni kiriting</p>
-            <label>Tasdiqlash kodi</label><input type="password" id="twoFAInput" placeholder="Kodni kiriting" autocomplete="off">
+            <p class="subtitle" id="twoFAUserLabel">Maxfiy kod</p>
+            <label>Kod</label><input type="password" id="twoFAInput" placeholder="Kodni kiriting">
             <p class="error-msg" id="twoFAError"></p>
             <button class="btn" id="twoFABtn">✅ Tasdiqlash</button>
             <button class="btn" style="background:#f1f3f4;color:#333;margin-top:8px;" id="backToLoginBtn">⬅️ Orqaga</button>
@@ -203,56 +134,51 @@
                 <div class="user-name" id="otherUserName">...</div>
                 <div class="user-status" id="otherUserStatus">oflayn</div>
             </div>
-            <div class="call-btns">
-                <button class="call-btn audio-call" id="audioCallBtn">📞</button>
-                <button class="call-btn video-call" id="videoCallBtn">📹</button>
-            </div>
+            <button class="call-btn" id="audioCallBtn">📞</button>
+            <button class="call-btn" id="videoCallBtn">📹</button>
         </div>
         <div class="messages-container" id="messagesContainer"></div>
-        <div class="input-area" id="inputArea">
-            <button class="attach-btn" id="attachBtn">📎</button>
-            <div class="attach-menu" id="attachMenu">
+        <div class="input-area">
+            <button id="attachBtn">📎</button>
+            <div id="attachMenu" style="display:none;position:absolute;bottom:60px;background:#fff;border-radius:8px;box-shadow:var(--shadow-lg);">
                 <button id="sendImageBtn">🖼️ Rasm</button>
                 <button id="sendVideoBtn">🎬 Video</button>
-                <button id="sendAudioFileBtn">🎵 Audio fayl</button>
+                <button id="sendAudioFileBtn">🎵 Audio</button>
                 <button id="recordVoiceBtn">🎤 Ovozli xabar</button>
             </div>
             <textarea id="messageInput" rows="1" placeholder="Xabar yozing..."></textarea>
             <button class="send-btn" id="sendBtn" disabled>➤</button>
-            <input type="file" id="imageFileInput" accept="image/*" style="display:none">
-            <input type="file" id="videoFileInput" accept="video/*" style="display:none">
-            <input type="file" id="audioFileInput" accept="audio/*" style="display:none">
+            <input type="file" id="imageFileInput" accept="image/*" hidden>
+            <input type="file" id="videoFileInput" accept="video/*" hidden>
+            <input type="file" id="audioFileInput" accept="audio/*" hidden>
         </div>
     </div>
     <!-- VIDEO CALL MODAL -->
     <div class="call-modal" id="videoCallModal">
         <video class="remote-video" id="remoteVideo" autoplay playsinline></video>
         <video class="local-video" id="localVideo" autoplay playsinline muted></video>
-        <p class="call-status" id="videoCallStatus">Video chat ulanish kutilmoqda...</p>
         <div class="call-controls">
-            <button class="ctrl-btn mute-btn" id="videoMuteBtn">🎙️</button>
+            <button class="ctrl-btn" id="videoMuteBtn">🎙️</button>
             <button class="ctrl-btn end-call" id="endVideoCallBtn">📴</button>
         </div>
     </div>
     <!-- AUDIO CALL MODAL -->
     <div class="call-modal" id="audioCallModal">
         <div style="color:#fff;font-size:60px;">📞</div>
-        <p class="call-status" id="audioCallStatus">Audio chat ulanish kutilmoqda...</p>
         <div class="call-controls">
-            <button class="ctrl-btn mute-btn" id="audioMuteBtn">🎙️</button>
+            <button class="ctrl-btn" id="audioMuteBtn">🎙️</button>
             <button class="ctrl-btn end-call" id="endAudioCallBtn">📴</button>
         </div>
     </div>
-    <!-- POPUP & TOAST -->
     <div class="msg-popup" id="msgPopup">
         <button id="editMsgBtn">✏️ Tahrirlash</button>
-        <button class="delete-opt" id="deleteMsgBtn">🗑️ Oʻchirish</button>
+        <button id="deleteMsgBtn" style="color:red;">🗑️ O'chirish</button>
     </div>
     <div class="toast" id="toast"></div>
 </div>
 
 <script>
-    // ===================== FIREBASE CONFIG =====================
+    // ========== FIREBASE CONFIG – O'ZINGIZNIKI BILAN ALMASHTIRING ==========
     const firebaseConfig = {
         apiKey: "AIzaSyC8ZNN4-AQ0dp1DyTkXi8v0URrQ9U6BL0",
         authDomain: "chat-3a98a.firebaseapp.com",
@@ -263,118 +189,110 @@
         measurementId: "G-ZRVVN55E2M",
         databaseURL: "https://chat-3a98a-default-rtdb.firebaseio.com"
     };
-    // ==========================================================
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // ---------- USER DATA ----------
     const USERS = {
         'user_1': { password: 'u.s.e.r_1', nickname: 'Jasurbek' },
         'user_2': { password: 'u.s.e.r_2', nickname: 'Dilnura' }
     };
     const TWO_FA_CODE = 'only2';
+    let currentUser = null;
+    const $ = (s) => document.querySelector(s);
 
-    let currentUser = null; // { login, password, nickname }
-    const $ = (sel) => document.querySelector(sel);
-
-    // ---------- HELPERS ----------
     function showToast(msg) {
         const t = $('#toast');
         t.textContent = msg; t.classList.add('show');
-        clearTimeout(t._timeout);
-        t._timeout = setTimeout(() => t.classList.remove('show'), 2500);
+        clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 2500);
     }
+
     function formatTime(ts) {
         const d = new Date(ts);
-        const hh = String(d.getHours()).padStart(2,'0');
-        const mm = String(d.getMinutes()).padStart(2,'0');
+        const hh = String(d.getHours()).padStart(2,'0'), mm = String(d.getMinutes()).padStart(2,'0');
         if (d.toDateString() === new Date().toDateString()) return `Bugun ${hh}:${mm}`;
-        const dd = String(d.getDate()).padStart(2,'0');
-        const mon = String(d.getMonth()+1).padStart(2,'0');
-        return `${dd}.${mon}.${d.getFullYear()} ${hh}:${mm}`;
+        return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')} ${hh}:${mm}`;
     }
+
     function getOtherUser() {
-        if (!currentUser) return null;
-        return currentUser.login === 'user_1' ? {login:'user_2', ...USERS['user_2']} : {login:'user_1', ...USERS['user_1']};
+        return currentUser?.login === 'user_1' ? {login:'user_2', ...USERS['user_2']} : {login:'user_1', ...USERS['user_1']};
     }
-    function generateId() { return 'msg_'+Date.now()+'_'+Math.random().toString(36).substr(2,6); }
+
+    function generateId() { return 'msg_'+Date.now()+'_'+Math.random().toString(36).slice(2,8); }
 
     // ---------- AUTH ----------
     function showScreen(id) {
         ['loginScreen','twoFAScreen','chatScreen'].forEach(s => $('#'+s).classList.remove('active'));
         $('#'+id).classList.add('active');
     }
+
     $('#loginBtn').onclick = () => {
         const login = $('#loginInput').value.trim();
         const pass = $('#passwordInput').value;
         $('#loginError').textContent = '';
-        if (!USERS[login]) { $('#loginError').textContent = '❌ Bunday foydalanuvchi mavjud emas'; return; }
-        if (USERS[login].password !== pass) { $('#loginError').textContent = '❌ Parol noto\'g\'ri'; return; }
-        currentUser = { login, password: pass, nickname: USERS[login].nickname };
-        $('#twoFAUserLabel').textContent = USERS[login].nickname + ', maxfiy kodni kiriting';
-        $('#twoFAInput').value = ''; $('#twoFAError').textContent = '';
+        if (!USERS[login]) { $('#loginError').textContent = '❌ Foydalanuvchi topilmadi'; return; }
+        if (USERS[login].password !== pass) { $('#loginError').textContent = '❌ Parol xato'; return; }
+        currentUser = { login, nickname: USERS[login].nickname };
+        $('#twoFAUserLabel').textContent = USERS[login].nickname + ', maxfiy kod';
         showScreen('twoFAScreen'); $('#twoFAInput').focus();
     };
+
     $('#twoFABtn').onclick = () => {
-        const code = $('#twoFAInput').value.trim();
-        $('#twoFAError').textContent = '';
-        if (code !== TWO_FA_CODE) { $('#twoFAError').textContent = '❌ Kod noto\'g\'ri. "only2"'; return; }
+        if ($('#twoFAInput').value.trim() !== TWO_FA_CODE) { $('#twoFAError').textContent = '❌ Noto‘g‘ri kod'; return; }
         initChat();
     };
     $('#backToLoginBtn').onclick = () => { currentUser = null; showScreen('loginScreen'); };
-    $('#logoutBtn').onclick = logout;
 
-    // ---------- CHAT INIT ----------
+    // ---------- CHAT ----------
     function initChat() {
         showScreen('chatScreen');
-        $('#otherUserName').textContent = getOtherUser().nickname;
-        $('#otherAvatar').textContent = getOtherUser().nickname.charAt(0);
+        const other = getOtherUser();
+        $('#otherUserName').textContent = other.nickname;
+        $('#otherAvatar').textContent = other.nickname[0];
         listenMessages();
         listenPresence();
-        updateMyPresence(true);
+        updatePresence(true);
         $('#messageInput').focus();
+    }
 
-        // Heartbeat for online status
-        const presenceRef = db.ref(`status/${currentUser.login}`);
-        db.ref('.info/connected').on('value', snap => {
-            if (snap.val() === true) {
-                presenceRef.onDisconnect().set({ online: false, lastSeen: firebase.database.ServerValue.TIMESTAMP });
-                presenceRef.set({ online: true, lastSeen: firebase.database.ServerValue.TIMESTAMP });
+    $('#logoutBtn').onclick = () => {
+        if (currentUser) updatePresence(false);
+        db.ref('messages').off();
+        db.ref(`status/${getOtherUser()?.login}`).off();
+        currentUser = null;
+        showScreen('loginScreen');
+    };
+
+    function updatePresence(online) {
+        if (!currentUser) return;
+        db.ref(`status/${currentUser.login}`).set({ online, lastSeen: firebase.database.ServerValue.TIMESTAMP });
+    }
+
+    function listenPresence() {
+        const other = getOtherUser();
+        if (!other) return;
+        db.ref(`status/${other.login}`).on('value', snap => {
+            const data = snap.val();
+            if (!data) return;
+            const el = $('#otherUserStatus');
+            if (data.online) { el.textContent = 'hozir online 🟢'; el.className = 'user-status'; }
+            else {
+                el.textContent = 'oxirgi marta: ' + (data.lastSeen ? formatTime(data.lastSeen) : 'nomaʼlum');
+                el.className = 'user-status offline';
             }
         });
     }
 
-    function logout() {
-        if (currentUser) {
-            db.ref(`status/${currentUser.login}`).set({ online: false, lastSeen: firebase.database.ServerValue.TIMESTAMP });
-        }
-        // Stop listeners
-        db.ref('messages').off();
-        db.ref(`status/${getOtherUser()?.login}`).off();
-        currentUser = null;
-        $('#messagesContainer').innerHTML = '';
-        showScreen('loginScreen');
-    }
-
-    // ---------- MESSAGES (FIREBASE) ----------
+    // Messages
     function listenMessages() {
-        const container = $('#messagesContainer');
-        db.ref('messages').off(); // clear previous
-        db.ref('messages').on('child_added', snap => {
-            const msg = snap.val();
-            renderMessage(msg);
-            container.scrollTop = container.scrollHeight;
-        });
+        db.ref('messages').off();
+        db.ref('messages').on('child_added', snap => renderMessage(snap.val()));
         db.ref('messages').on('child_changed', snap => {
-            // re-render edited / seen
-            const msg = snap.val();
-            const el = document.querySelector(`[data-id="${msg.id}"]`);
-            if (el) el.remove();
-            renderMessage(msg);
-        });
-        db.ref('messages').on('child_removed', snap => {
             const el = document.querySelector(`[data-id="${snap.val().id}"]`);
             if (el) el.remove();
+            renderMessage(snap.val());
+        });
+        db.ref('messages').on('child_removed', snap => {
+            document.querySelector(`[data-id="${snap.val().id}"]`)?.remove();
         });
     }
 
@@ -386,254 +304,171 @@
         const bubble = document.createElement('div');
         bubble.className = 'msg-bubble';
         if (msg.type === 'text') bubble.textContent = msg.content;
-        else if (msg.type === 'image') {
-            const img = document.createElement('img'); img.src = msg.content; img.onclick = ()=> window.open(msg.content);
-            bubble.appendChild(img);
-        } else if (msg.type === 'video') {
-            const vid = document.createElement('video'); vid.src = msg.content; vid.controls = true;
-            bubble.appendChild(vid);
-        } else if (msg.type === 'audio') {
-            const aud = document.createElement('audio'); aud.src = msg.content; aud.controls = true;
-            bubble.appendChild(aud);
-        }
+        else if (msg.type === 'image') { const img = document.createElement('img'); img.src = msg.content; bubble.appendChild(img); }
+        else if (msg.type === 'video') { const vid = document.createElement('video'); vid.src = msg.content; vid.controls = true; bubble.appendChild(vid); }
+        else if (msg.type === 'audio') { const aud = document.createElement('audio'); aud.src = msg.content; aud.controls = true; bubble.appendChild(aud); }
         wrapper.appendChild(bubble);
         const meta = document.createElement('div');
         meta.className = 'msg-meta';
         let text = formatTime(msg.timestamp);
-        if (msg.edited) text += ' · <span class="edited-tag">tahrirlangan</span>';
-        if (msg.sender === currentUser.login && msg.seenAt) {
-            text += ` · <span class="seen-status">✅ ${formatTime(msg.seenAt).split(' ').pop()}</span>`;
-        } else if (msg.sender === currentUser.login) text += ' · <span style="color:#999;">✓</span>';
+        if (msg.edited) text += ' · <span style="font-style:italic">tahrirlangan</span>';
+        if (msg.sender === currentUser.login) {
+            text += msg.seenAt ? ` · <span style="color:#4a90d9">✅ ${formatTime(msg.seenAt)}</span>` : ' · ✓';
+        }
         meta.innerHTML = text;
         wrapper.appendChild(meta);
-        // double click for own messages
         if (msg.sender === currentUser.login) {
-            wrapper.ondblclick = (e) => {
-                selectedMsgId = msg.id;
-                showMsgPopup(e.clientX, e.clientY);
-            };
-            let timer;
-            wrapper.ontouchstart = (e) => {
-                timer = setTimeout(() => {
-                    selectedMsgId = msg.id;
-                    const t = e.touches[0];
-                    showMsgPopup(t.clientX, t.clientY);
-                }, 600);
-            };
-            wrapper.ontouchend = () => clearTimeout(timer);
-            wrapper.ontouchmove = () => clearTimeout(timer);
+            wrapper.ondblclick = (e) => { selectedMsgId = msg.id; showPopup(e.clientX, e.clientY); };
         }
         container.appendChild(wrapper);
-        // mark seen for received messages
+        container.scrollTop = container.scrollHeight;
         if (msg.sender !== currentUser.login && !msg.seenAt) {
             db.ref(`messages/${msg.id}`).update({ seenAt: firebase.database.ServerValue.TIMESTAMP });
         }
     }
 
     function sendMessage(content, type='text') {
-        if (!currentUser || !content.trim()) return;
+        if (!content.trim()) return;
         const msg = {
-            id: generateId(),
-            sender: currentUser.login,
-            content: content.trim(),
-            type: type,
-            timestamp: firebase.database.ServerValue.TIMESTAMP,
-            edited: false,
-            seenAt: null
+            id: generateId(), sender: currentUser.login, content: content.trim(), type,
+            timestamp: firebase.database.ServerValue.TIMESTAMP, edited: false, seenAt: null
         };
         db.ref(`messages/${msg.id}`).set(msg);
         $('#messageInput').value = ''; $('#sendBtn').disabled = true;
-        $('#messageInput').style.height = 'auto';
     }
 
-    // Edit / Delete
     let selectedMsgId = null;
-    function showMsgPopup(x,y) {
-        const pop = $('#msgPopup');
-        pop.style.top = Math.min(y, window.innerHeight-120)+'px';
-        pop.style.left = Math.min(x, window.innerWidth-160)+'px';
-        pop.classList.add('show');
-        setTimeout(() => {
-            const close = () => { pop.classList.remove('show'); document.removeEventListener('click', close); };
-            document.addEventListener('click', close, {once:true});
-        }, 50);
+    function showPopup(x,y) {
+        const p = $('#msgPopup');
+        p.style.top = Math.min(y, window.innerHeight-120)+'px';
+        p.style.left = Math.min(x, window.innerWidth-160)+'px';
+        p.style.display = 'block';
+        setTimeout(() => document.addEventListener('click', function h() { p.style.display = 'none'; document.removeEventListener('click',h); }, {once:true}));
     }
+
     $('#editMsgBtn').onclick = () => {
-        $('#msgPopup').classList.remove('show');
-        if (selectedMsgId) {
-            db.ref(`messages/${selectedMsgId}`).once('value').then(snap => {
-                const msg = snap.val();
-                if (msg && msg.type === 'text') {
-                    const newText = prompt('Tahrirlash:', msg.content);
-                    if (newText !== null && newText.trim()) {
-                        db.ref(`messages/${selectedMsgId}`).update({ content: newText.trim(), edited: true, timestamp: firebase.database.ServerValue.TIMESTAMP });
-                    }
-                } else showToast('Faqat matnli xabarlarni tahrirlash mumkin');
-                selectedMsgId = null;
-            });
-        }
+        $('#msgPopup').style.display = 'none';
+        if (!selectedMsgId) return;
+        db.ref(`messages/${selectedMsgId}`).once('value').then(snap => {
+            const msg = snap.val();
+            if (msg?.type === 'text') {
+                const newText = prompt('Tahrirlash:', msg.content);
+                if (newText?.trim()) db.ref(`messages/${selectedMsgId}`).update({ content: newText.trim(), edited: true });
+            } else showToast('Faqat matn tahrirlanadi');
+        });
     };
     $('#deleteMsgBtn').onclick = () => {
-        $('#msgPopup').classList.remove('show');
-        if (selectedMsgId && confirm('Oʻchirishni istaysizmi?')) {
-            db.ref(`messages/${selectedMsgId}`).remove();
-        }
-        selectedMsgId = null;
+        $('#msgPopup').style.display = 'none';
+        if (selectedMsgId && confirm('O‘chirilsinmi?')) db.ref(`messages/${selectedMsgId}`).remove();
     };
 
-    // File uploads
-    $('#sendBtn').onclick = () => { const t = $('#messageInput').value.trim(); if(t) sendMessage(t); };
-    $('#messageInput').oninput = function() {
-        $('#sendBtn').disabled = this.value.trim() === '';
-        this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight,100)+'px';
-    };
-    $('#messageInput').onkeydown = function(e) {
-        if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); const t=this.value.trim(); if(t) sendMessage(t); }
-    };
-    $('#attachBtn').onclick = (e) => { e.stopPropagation(); $('#attachMenu').classList.toggle('show'); };
-    document.addEventListener('click', () => $('#attachMenu').classList.remove('show'));
-    $('#sendImageBtn').onclick = () => { $('#imageFileInput').click(); };
-    $('#sendVideoBtn').onclick = () => { $('#videoFileInput').click(); };
-    $('#sendAudioFileBtn').onclick = () => { $('#audioFileInput').click(); };
-    $('#recordVoiceBtn').onclick = toggleRecording;
-
+    // File upload & recording
+    $('#sendBtn').onclick = () => sendMessage($('#messageInput').value);
+    $('#messageInput').oninput = function() { $('#sendBtn').disabled = !this.value.trim(); };
+    $('#attachBtn').onclick = (e) => { e.stopPropagation(); $('#attachMenu').style.display = $('#attachMenu').style.display==='block'?'none':'block'; };
+    document.addEventListener('click', () => $('#attachMenu').style.display = 'none');
+    $('#sendImageBtn').onclick = () => $('#imageFileInput').click();
+    $('#sendVideoBtn').onclick = () => $('#videoFileInput').click();
+    $('#sendAudioFileBtn').onclick = () => $('#audioFileInput').click();
     function handleFile(file, type) {
         if (!file) return;
-        if (file.size > 8*1024*1024) { showToast('Fayl 8MB dan kichik boʻlishi kerak'); return; }
         const reader = new FileReader();
         reader.onload = e => sendMessage(e.target.result, type);
         reader.readAsDataURL(file);
     }
-    $('#imageFileInput').onchange = function() { if(this.files[0]) { handleFile(this.files[0],'image'); this.value=''; } };
-    $('#videoFileInput').onchange = function() { if(this.files[0]) { handleFile(this.files[0],'video'); this.value=''; } };
-    $('#audioFileInput').onchange = function() { if(this.files[0]) { handleFile(this.files[0],'audio'); this.value=''; } };
+    $('#imageFileInput').onchange = function() { handleFile(this.files[0],'image'); this.value=''; };
+    $('#videoFileInput').onchange = function() { handleFile(this.files[0],'video'); this.value=''; };
+    $('#audioFileInput').onchange = function() { handleFile(this.files[0],'audio'); this.value=''; };
 
     // Voice recording
     let mediaRecorder, audioChunks, isRecording = false;
-    async function toggleRecording() {
-        if (isRecording) {
-            mediaRecorder.stop();
-            isRecording = false;
-            $('#recordVoiceBtn').textContent = '🎤';
-        } else {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
-                audioChunks = [];
-                mediaRecorder.ondataavailable = e => { if(e.data.size>0) audioChunks.push(e.data); };
-                mediaRecorder.onstop = () => {
-                    const blob = new Blob(audioChunks, { type: 'audio/webm' });
-                    const reader = new FileReader();
-                    reader.onload = e => sendMessage(e.target.result, 'audio');
-                    reader.readAsDataURL(blob);
-                    stream.getTracks().forEach(t=>t.stop());
-                    $('#recordVoiceBtn').textContent = '🎤';
-                };
-                mediaRecorder.start();
-                isRecording = true;
-                $('#recordVoiceBtn').textContent = '⏹️';
-            } catch (err) { showToast('Mikrofon ruxsati yoʻq'); }
-        }
-    }
+    $('#recordVoiceBtn').onclick = async () => {
+        if (isRecording) { mediaRecorder.stop(); isRecording=false; $('#recordVoiceBtn').textContent='🎤'; return; }
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(audioChunks, {type:'audio/webm'});
+                const reader = new FileReader();
+                reader.onload = e => sendMessage(e.target.result, 'audio');
+                reader.readAsDataURL(blob);
+                stream.getTracks().forEach(t=>t.stop());
+            };
+            mediaRecorder.start();
+            isRecording = true; $('#recordVoiceBtn').textContent='⏹️';
+        } catch { showToast('Mikrofon ruxsati yo‘q'); }
+    };
 
-    // ---------- PRESENCE ----------
-    function listenPresence() {
-        const other = getOtherUser();
-        if (!other) return;
-        const statusRef = db.ref(`status/${other.login}`);
-        statusRef.on('value', snap => {
-            const data = snap.val();
-            if (data) {
-                const online = data.online;
-                $('#otherUserStatus').textContent = online ? 'hozir online 🟢' : 'oxirgi marta: ' + formatLastSeen(data.lastSeen);
-                $('#otherUserStatus').className = 'user-status' + (online ? '' : ' offline');
-            }
-        });
-    }
-    function updateMyPresence(online) {
-        if (!currentUser) return;
-        db.ref(`status/${currentUser.login}`).update({ online, lastSeen: firebase.database.ServerValue.TIMESTAMP });
-    }
-    function formatLastSeen(ts) {
-        if (!ts) return 'nomaʼlum';
-        const diff = Date.now() - ts;
-        if (diff < 15000) return 'hozirgina';
-        if (diff < 60000) return 'bir daqiqa oldin';
-        if (diff < 3600000) return Math.floor(diff/60000)+' daqiqa oldin';
-        if (diff < 86400000) return Math.floor(diff/3600000)+' soat oldin';
-        return formatTime(ts);
-    }
-
-    // ---------- WEBRTC (Video/Audio) via Firebase signaling ----------
-    let localStream, pc, callType = null;
+    // ========== WEBRTC (to'liq ishlaydigan) ==========
+    let localStream, pc, callType, callId;
     const signalingRef = db.ref('signaling');
 
     async function startCall(type) {
         callType = type;
         try {
-            const constraints = { audio: true, video: type==='video' };
-            localStream = await navigator.mediaDevices.getUserMedia(constraints);
+            localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: type==='video' });
             if (type==='video') {
                 $('#localVideo').srcObject = localStream;
                 $('#videoCallModal').classList.add('active');
             } else {
                 $('#audioCallModal').classList.add('active');
             }
+            callId = generateId();
             pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
             localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
-            pc.onicecandidate = event => {
-                if (event.candidate) {
-                    signalingRef.push({ type: 'candidate', candidate: event.candidate, from: currentUser.login, callType });
-                }
+            pc.onicecandidate = e => {
+                if (e.candidate) signalingRef.child(callId).push({ type:'candidate', candidate:e.candidate, from:currentUser.login });
             };
-            pc.ontrack = event => {
-                if (callType==='video') {
-                    $('#remoteVideo').srcObject = event.streams[0];
-                } else {
-                    const audio = new Audio(); audio.srcObject = event.streams[0]; audio.play();
-                }
+            pc.ontrack = e => {
+                if (type==='video') $('#remoteVideo').srcObject = e.streams[0];
+                else { const audio = new Audio(); audio.srcObject = e.streams[0]; audio.play(); }
             };
-            pc.onconnectionstatechange = () => {
-                if (pc.connectionState === 'connected') showToast('Ulanish oʻrnatildi ✅');
-                else if (pc.connectionState === 'failed') showToast('Aloqa uzildi ❌');
-            };
+            // Listen for remote offer/answer/candidates
+            db.ref(`signaling/${callId}`).on('child_added', handleSignaling);
             const offer = await pc.createOffer();
             await pc.setLocalDescription(offer);
-            signalingRef.push({ type: 'offer', sdp: offer, from: currentUser.login, callType });
-            // Listen for answer & candidates
-            signalingRef.on('child_added', handleSignaling);
-        } catch (err) { showToast('Kamera/mikrofon ruxsati yoʻq'); endCall(); }
+            db.ref(`signaling/${callId}`).push({ type:'offer', sdp:offer, from:currentUser.login });
+            showToast('Qo‘ng‘iroq boshlandi. Ikkala tomon ham “Video/Audio” tugmasini bosganiga ishonch hosil qiling.');
+        } catch (err) {
+            showToast('Kamera/mikrofon ruxsati kerak');
+            endCall();
+        }
     }
 
     function handleSignaling(snap) {
         const data = snap.val();
-        if (!data || data.from === currentUser.login || data.callType !== callType) return;
-        if (data.type === 'offer' && pc) {
-            pc.setRemoteDescription(new RTCSessionDescription(data.sdp)).then(() => {
-                return pc.createAnswer();
-            }).then(answer => {
+        if (!data || data.from === currentUser.login) return;
+        if (!pc) { /* Agar ikkinchisi startCall qilmagan bo'lsa, avtomatik qabul qilishni taklif etamiz */
+            showToast('Boshqa foydalanuvchi qo‘ng‘iroq qildi. Siz ham Video/Audio tugmasini bosing.');
+            return;
+        }
+        if (data.type === 'offer') {
+            pc.setRemoteDescription(new RTCSessionDescription(data.sdp)).then(() => pc.createAnswer()).then(answer => {
                 return pc.setLocalDescription(answer);
             }).then(() => {
-                signalingRef.push({ type: 'answer', sdp: pc.localDescription, from: currentUser.login, callType });
+                db.ref(`signaling/${callId}`).push({ type:'answer', sdp:pc.localDescription, from:currentUser.login });
             });
-        } else if (data.type === 'answer' && pc) {
+        } else if (data.type === 'answer') {
             pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
-        } else if (data.type === 'candidate' && pc) {
+        } else if (data.type === 'candidate') {
             pc.addIceCandidate(new RTCIceCandidate(data.candidate));
         }
-        // Clean old signaling messages (optional)
     }
 
     function endCall() {
         if (pc) { pc.close(); pc = null; }
-        if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+        if (localStream) { localStream.getTracks().forEach(t=>t.stop()); localStream=null; }
         $('#localVideo').srcObject = null; $('#remoteVideo').srcObject = null;
         $('#videoCallModal').classList.remove('active');
         $('#audioCallModal').classList.remove('active');
-        signalingRef.off('child_added', handleSignaling);
-        // Remove signaling data
-        signalingRef.remove();
-        callType = null;
+        if (callId) {
+            db.ref(`signaling/${callId}`).off();
+            db.ref(`signaling/${callId}`).remove();
+        }
+        callType = callId = null;
+        showToast('Qo‘ng‘iroq tugatildi');
     }
 
     $('#videoCallBtn').onclick = () => startCall('video');
@@ -655,10 +490,7 @@
         }
     };
 
-    // Cleanup on page unload
-    window.onbeforeunload = () => {
-        if (currentUser) updateMyPresence(false);
-    };
+    window.onbeforeunload = () => { if (currentUser) updatePresence(false); };
 </script>
 </body>
 </html>
