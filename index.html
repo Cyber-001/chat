@@ -1,258 +1,453 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Only2 – Firebase Chat</title>
-    <!-- Firebase SDK (CDN) -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-    <style>
-        :root {
-            --bg: #f0f2f5;
-            --white: #fff;
-            --primary: #1a73e8;
-            --primary-dark: #1557b0;
-            --text: #202124;
-            --text-light: #5f6368;
-            --border: #dadce0;
-            --msg-sent: #d2e3fc;
-            --msg-received: #fff;
-            --danger: #ea4335;
-            --success: #34a853;
-            --shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
-            --shadow-lg: 0 4px 20px rgba(0,0,0,0.15);
-            --radius: 12px;
-            --radius-sm: 8px;
-            --transition: 0.2s ease;
-        }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: var(--bg); color: var(--text);
-            min-height:100vh; display:flex; align-items:center; justify-content:center;
-            -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none;
-        }
-        .app-container {
-            width:100%; max-width:500px; height:100vh; max-height:850px;
-            background:var(--white); border-radius:0; box-shadow:var(--shadow-lg);
-            display:flex; flex-direction:column; overflow:hidden; position:relative;
-        }
-        @media (min-width:520px) {
-            .app-container { border-radius:var(--radius); height:90vh; max-height:800px; margin:20px; }
-        }
-        @media (min-width:768px) {
-            .app-container { max-width:550px; height:88vh; max-height:850px; }
-        }
-        .screen { display:none; flex-direction:column; height:100%; width:100%; position:absolute; top:0; left:0; background:var(--white); z-index:1; }
-        .screen.active { display:flex; z-index:10; }
-        .auth-screen { display:flex; align-items:center; justify-content:center; padding:20px; }
-        .auth-screen.active { display:flex; }
-        .auth-card {
-            width:100%; max-width:380px; padding:30px 24px; background:var(--white);
-            border-radius:var(--radius); box-shadow:var(--shadow); text-align:center;
-        }
-        .auth-card .logo { font-size:42px; margin-bottom:8px; }
-        .auth-card h2 { font-size:22px; font-weight:600; margin-bottom:6px; }
-        .auth-card .subtitle { font-size:13px; color:var(--text-light); margin-bottom:24px; }
-        .auth-card label {
-            display:block; text-align:left; font-size:12px; font-weight:600;
-            color:var(--text-light); margin-bottom:4px; letter-spacing:0.3px; text-transform:uppercase;
-        }
-        .auth-card input {
-            width:100%; padding:11px 14px; border:2px solid var(--border);
-            border-radius:var(--radius-sm); font-size:15px; margin-bottom:14px;
-            transition:var(--transition); outline:none; background:#fafafa; font-family:inherit;
-        }
-        .auth-card input:focus { border-color:var(--primary); background:#fff; box-shadow:0 0 0 3px rgba(26,115,232,0.1); }
-        .auth-card .btn {
-            width:100%; padding:12px; background:var(--primary); color:#fff;
-            border:none; border-radius:24px; font-size:15px; font-weight:600;
-            cursor:pointer; transition:var(--transition); letter-spacing:0.3px; font-family:inherit;
-        }
-        .auth-card .btn:hover { background:var(--primary-dark); transform:translateY(-1px); box-shadow:var(--shadow); }
-        .auth-card .btn:active { transform:scale(0.97); }
-        .auth-card .error-msg { color:var(--danger); font-size:13px; margin-top:4px; min-height:20px; }
-        .auth-card .hint { font-size:11px; color:var(--text-light); margin-top:16px; opacity:0.8; }
-        .chat-header {
-            display:flex; align-items:center; padding:10px 14px;
-            border-bottom:1px solid var(--border); background:#fff; gap:10px; flex-shrink:0; z-index:5;
-        }
-        .chat-header .back-btn { font-size:20px; cursor:pointer; padding:6px; border-radius:50%; transition:var(--transition); display:flex; align-items:center; justify-content:center; width:36px; height:36px; flex-shrink:0; }
-        .chat-header .back-btn:hover { background:#f1f3f4; }
-        .chat-header .avatar { width:40px; height:40px; border-radius:50%; background:var(--primary); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:17px; flex-shrink:0; }
-        .chat-header .user-info { flex:1; min-width:0; }
-        .chat-header .user-name { font-weight:600; font-size:15px; }
-        .chat-header .user-status { font-size:12px; color:var(--success); font-weight:500; }
-        .chat-header .user-status.offline { color:var(--text-light); }
-        .chat-header .call-btns { display:flex; gap:6px; flex-shrink:0; }
-        .chat-header .call-btn { width:36px; height:36px; border-radius:50%; border:none; background:#f1f3f4; cursor:pointer; font-size:17px; transition:var(--transition); display:flex; align-items:center; justify-content:center; }
-        .chat-header .call-btn:hover { background:#e8eaed; }
-        .chat-header .call-btn.video-call { background:#e8f0fe; color:var(--primary); }
-        .chat-header .call-btn.audio-call { background:#e6f4ea; color:var(--success); }
-        .messages-container {
-            flex:1; overflow-y:auto; padding:12px 14px; display:flex;
-            flex-direction:column; gap:4px; background:#f8f9fa; scroll-behavior:smooth;
-        }
-        .messages-container::-webkit-scrollbar { width:5px; }
-        .messages-container::-webkit-scrollbar-track { background:transparent; }
-        .messages-container::-webkit-scrollbar-thumb { background:#ccc; border-radius:10px; }
-        .msg-wrapper { display:flex; flex-direction:column; max-width:80%; animation: fadeInUp 0.25s ease; }
-        @keyframes fadeInUp { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
-        .msg-wrapper.sent { align-self:flex-end; }
-        .msg-wrapper.received { align-self:flex-start; }
-        .msg-bubble {
-            padding:10px 14px; border-radius:18px; font-size:14px; line-height:1.45;
-            word-break:break-word; position:relative; cursor:pointer; transition:var(--transition);
-            box-shadow:0 1px 2px rgba(0,0,0,0.06);
-        }
-        .msg-wrapper.sent .msg-bubble { background:var(--msg-sent); border-bottom-right-radius:4px; }
-        .msg-wrapper.received .msg-bubble { background:var(--msg-received); border-bottom-left-radius:4px; border:1px solid #e8eaed; }
-        .msg-bubble img { max-width:240px; max-height:300px; border-radius:10px; cursor:pointer; display:block; }
-        .msg-bubble video { max-width:240px; max-height:300px; border-radius:10px; cursor:pointer; display:block; }
-        .msg-bubble audio { max-width:200px; display:block; }
-        .msg-meta {
-            font-size:10px; color:#6b7280; margin-top:3px; display:flex; gap:8px; align-items:center;
-        }
-        .msg-wrapper.sent .msg-meta { justify-content:flex-end; }
-        .msg-meta .seen-status { font-weight:500; color:#4a90d9; font-size:10px; }
-        .msg-meta .edited-tag { font-style:italic; opacity:0.7; }
-        .date-divider { text-align:center; font-size:11px; color:#8e8e93; margin:10px 0; font-weight:500; }
-        .input-area {
-            display:flex; align-items:flex-end; gap:6px; padding:8px 10px;
-            border-top:1px solid var(--border); background:#fff; flex-shrink:0; z-index:5; flex-wrap:wrap;
-        }
-        .input-area .attach-btn { width:38px; height:38px; border-radius:50%; border:none; background:#f1f3f4; cursor:pointer; font-size:20px; transition:var(--transition); flex-shrink:0; display:flex; align-items:center; justify-content:center; }
-        .input-area .attach-btn:hover { background:#e8eaed; }
-        .input-area textarea {
-            flex:1; min-width:0; padding:10px 14px; border:2px solid var(--border);
-            border-radius:22px; font-size:14px; resize:none; outline:none; max-height:100px;
-            font-family:inherit; background:#fafafa; transition:var(--transition); line-height:1.4;
-        }
-        .input-area textarea:focus { border-color:var(--primary); background:#fff; box-shadow:0 0 0 3px rgba(26,115,232,0.08); }
-        .input-area .send-btn { width:38px; height:38px; border-radius:50%; border:none; background:var(--primary); color:#fff; cursor:pointer; font-size:18px; transition:var(--transition); flex-shrink:0; display:flex; align-items:center; justify-content:center; }
-        .input-area .send-btn:hover { background:var(--primary-dark); }
-        .input-area .send-btn:active { transform:scale(0.92); }
-        .input-area .send-btn:disabled { background:#ccc; cursor:not-allowed; }
-        .attach-menu {
-            display:none; position:absolute; bottom:65px; left:10px; background:#fff;
-            border-radius:var(--radius); box-shadow:var(--shadow-lg); padding:6px 0; z-index:20; min-width:170px;
-        }
-        .attach-menu.show { display:block; animation: slideUp 0.2s ease; }
-        @keyframes slideUp { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
-        .attach-menu button {
-            display:block; width:100%; padding:10px 16px; border:none; background:none;
-            cursor:pointer; font-size:14px; text-align:left; transition:var(--transition); font-family:inherit;
-        }
-        .attach-menu button:hover { background:#f1f3f4; }
-        .call-modal {
-            display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-            background:rgba(0,0,0,0.9); z-index:100; flex-direction:column; align-items:center; justify-content:center;
-        }
-        .call-modal.active { display:flex; }
-        .call-modal video { width:100%; max-width:500px; border-radius:var(--radius); background:#1a1a1a; max-height:60vh; object-fit:cover; }
-        .call-modal .remote-video { width:100%; max-width:500px; max-height:60vh; border-radius:var(--radius); background:#1a1a1a; object-fit:cover; }
-        .call-modal .local-video { position:absolute; bottom:100px; right:20px; width:120px; height:160px; border-radius:var(--radius-sm); border:3px solid #fff; object-fit:cover; background:#333; z-index:5; }
-        .call-modal .call-controls { display:flex; gap:20px; margin-top:20px; }
-        .call-modal .ctrl-btn { width:55px; height:55px; border-radius:50%; border:none; cursor:pointer; font-size:24px; transition:var(--transition); display:flex; align-items:center; justify-content:center; }
-        .call-modal .ctrl-btn.end-call { background:var(--danger); color:#fff; }
-        .msg-popup { display:none; position:fixed; z-index:50; background:#fff; border-radius:var(--radius-sm); box-shadow:var(--shadow-lg); padding:4px 0; min-width:140px; }
-        .msg-popup.show { display:block; }
-        .msg-popup button { display:block; width:100%; padding:10px 16px; border:none; background:none; cursor:pointer; font-size:13px; text-align:left; transition:var(--transition); font-family:inherit; }
-        .msg-popup button:hover { background:#f1f3f4; }
-        .msg-popup button.delete-opt { color:var(--danger); }
-        .toast { position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:10px 20px; border-radius:20px; font-size:13px; z-index:200; opacity:0; transition:opacity 0.3s; pointer-events:none; }
-        .toast.show { opacity:1; }
-        @media (max-width:400px) {
-            .msg-wrapper { max-width:88%; }
-            .msg-bubble img, .msg-bubble video { max-width:180px; max-height:220px; }
-            .msg-bubble audio { max-width:150px; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+  <link rel="icon" type="image/png" href="logo.png">
+  <title>Shaxsiy Messenger</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    :root {
+      --bg: #f0f2f5;
+      --header-bg: rgba(255,255,255,0.35);
+      --chat-bg: transparent;
+      --bubble-me: #d1f0cc;
+      --bubble-you: #ffffff;
+      --text: #111b21;
+      --subtext: #667781;
+      --input-bg: rgba(255,255,255,0.7);
+      --shadow: 0 1px 3px rgba(0,0,0,0.08);
+      --accent: #25d366;
+      --accent-hover: #22c35e;
+      --danger: #ef5350;
+      --border: rgba(0,0,0,0.12);
+      --hover-row: rgba(0,0,0,0.05);
+      --overlay: rgba(0,0,0,0.5);
+      --online: #31a24c;
+      --seen: #4fc3f7;
+      --popup-bg: #ffffff;
+      --popup-text: #111b21;
+      --popup-hover: #f1f3f4;
+    }
+    body.dark {
+      --bg: #111b21;
+      --header-bg: rgba(32,44,51,0.35);
+      --chat-bg: transparent;
+      --bubble-me: #005c4b;
+      --bubble-you: #202c33;
+      --text: #e9edef;
+      --subtext: #8696a0;
+      --input-bg: rgba(42,57,66,0.7);
+      --shadow: 0 1px 3px rgba(0,0,0,0.4);
+      --border: rgba(255,255,255,0.12);
+      --hover-row: rgba(255,255,255,0.05);
+      --overlay: rgba(0,0,0,0.7);
+      --popup-bg: #2a3942;
+      --popup-text: #e9edef;
+      --popup-hover: #3a4954;
+    }
+    body {
+      background: var(--bg);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background 0.3s, color 0.3s;
+      margin: 0;
+    }
+    #app {
+      width: 100%;
+      max-width: 500px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--header-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+    @media (min-width: 700px) {
+      #app { height: 90vh; border-radius: 24px; margin: 20px; }
+    }
+
+    #login-screen {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 100%; padding: 24px;
+      background: transparent;
+    }
+    .login-card {
+      width: 100%; max-width: 340px;
+      background: var(--header-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 32px 24px;
+      border-radius: 24px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+    .login-logo {
+      width: 140px;
+      margin-bottom: 20px;
+    }
+    .globe-fallback {
+      font-size: 80px;
+      margin-bottom: 20px;
+    }
+    .step { display: none; }
+    .step.active { display: block; }
+    .login-card input {
+      width: 100%; padding: 14px 16px; margin: 8px 0;
+      border: 1px solid var(--border); border-radius: 14px;
+      background: var(--input-bg); color: var(--text); font-size: 15px; outline: none;
+      transition: 0.2s;
+    }
+    .login-card input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(37,211,102,0.2); }
+    .btn {
+      background: var(--accent); color: white; border: none;
+      padding: 13px 24px; border-radius: 30px; font-weight: 600;
+      font-size: 15px; cursor: pointer; margin-top: 10px; transition: 0.2s; width: 100%;
+      letter-spacing: 0.3px;
+    }
+    .btn:hover { background: var(--accent-hover); transform: scale(1.02); }
+    .btn-outline {
+      background: transparent; border: 1.5px solid var(--accent);
+      color: var(--accent); padding: 10px 20px; border-radius: 30px;
+      font-size: 14px; font-weight: 500; cursor: pointer; transition: 0.2s;
+    }
+    .btn-outline:hover { background: rgba(37,211,102,0.08); }
+    .error { color: var(--danger); font-size: 13px; margin-top: 6px; font-weight: 500; }
+
+    #chat-screen { display: none; flex-direction: column; height: 100%; background: transparent; }
+    #chat-screen.active { display: flex; }
+    #chat-header {
+      display: flex; align-items: center; padding: 10px 16px;
+      background: var(--header-bg); border-bottom: 1px solid var(--border);
+      gap: 12px; z-index: 2;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .profile-pic {
+      width: 44px; height: 44px; border-radius: 50%; object-fit: cover;
+      background: #dfe5e7; display: flex; align-items: center; justify-content: center;
+      font-weight: bold; color: #fff; font-size: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .profile-pic img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+    .header-info { flex: 1; }
+    .header-name { font-weight: 600; font-size: 16px; }
+    .header-status { font-size: 12px; color: var(--subtext); margin-top: 2px; }
+    .online-dot { width: 8px; height: 8px; background: var(--online); border-radius: 50%; display: inline-block; margin-right: 4px; }
+    .header-actions { display: flex; gap: 8px; }
+    .icon-btn {
+      background: none; border: none; font-size: 20px; cursor: pointer;
+      color: var(--subtext); padding: 6px; border-radius: 50%; width: 38px; height: 38px;
+      display: flex; align-items: center; justify-content: center; transition: 0.2s;
+    }
+    .icon-btn:hover { background: var(--hover-row); }
+
+    #messages {
+      flex: 1; overflow-y: auto; padding: 16px 12px;
+      display: flex; flex-direction: column; gap: 8px;
+      background: transparent;
+    }
+    .message-row {
+      display: flex; flex-direction: column; max-width: 82%; position: relative;
+      cursor: pointer; user-select: none;
+    }
+    .message-row.me { align-self: flex-end; align-items: flex-end; }
+    .message-row.you { align-self: flex-start; align-items: flex-start; }
+    .bubble {
+      padding: 10px 14px; border-radius: 18px; background: var(--bubble-you);
+      color: var(--text); word-wrap: break-word; white-space: pre-wrap;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12); user-select: none;
+      transition: 0.2s; line-height: 1.4;
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+    }
+    .message-row.me .bubble { background: var(--bubble-me); }
+    .bubble.reply-preview {
+      border-left: 4px solid var(--accent); padding-left: 12px;
+      margin-bottom: 4px; font-size: 13px; opacity: 0.8;
+      background: var(--hover-row); border-radius: 12px;
+    }
+    .timestamp { font-size: 11px; color: var(--subtext); margin-top: 3px; padding: 0 6px; display: flex; align-items: center; gap: 6px; }
+    .edited { font-size: 10px; font-style: italic; margin-left: 4px; }
+    .msg-status { display: inline-flex; align-items: center; gap: 2px; margin-left: 4px; }
+    .msg-status .seen-icon { color: var(--seen); font-weight: 500; }
+    .media-msg img, .media-msg video { max-width: 220px; max-height: 220px; border-radius: 14px; display: block; }
+    .audio-msg audio { max-width: 200px; }
+
+    /* Uch nuqtali menyu tugmasi */
+    .msg-options {
+      position: absolute;
+      top: 0px;
+      right: -36px;
+      width: 32px;
+      height: 32px;
+      background: var(--header-bg);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: var(--text);
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s, background 0.2s;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 5;
+    }
+    .message-row.me .msg-options {
+      right: auto;
+      left: -36px;
+    }
+    .message-row:hover .msg-options,
+    .message-row.me:hover .msg-options,
+    .message-row.you:hover .msg-options {
+      opacity: 1;
+    }
+    .msg-options:hover {
+      background: var(--hover-row);
+    }
+
+    /* Popup menyu */
+    .msg-popup {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      background: var(--popup-bg);
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+      padding: 6px 0;
+      min-width: 150px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .msg-popup button {
+      display: block;
+      width: 100%;
+      padding: 12px 20px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 14px;
+      text-align: left;
+      transition: 0.2s;
+      font-family: inherit;
+      color: var(--popup-text);
+    }
+    .msg-popup button:hover { background: var(--popup-hover); }
+    .msg-popup button.delete-opt { color: var(--danger); }
+
+    #input-area {
+      display: flex; align-items: center; padding: 10px 14px;
+      background: var(--header-bg); gap: 10px; border-top: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    #message-input {
+      flex: 1; padding: 12px 18px; border-radius: 28px;
+      border: 1px solid var(--border); background: var(--input-bg);
+      color: var(--text); outline: none; font-size: 15px;
+      transition: 0.2s;
+    }
+    #message-input:focus { border-color: var(--accent); }
+    #typing-indicator { padding: 2px 20px; font-size: 12px; color: var(--accent); font-style: italic; display: none; }
+    .sticker-panel {
+      position: absolute; bottom: 65px; right: 15px;
+      background: var(--header-bg); border-radius: 20px;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.2); padding: 14px;
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 10px;
+      z-index: 10; display: none;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+    }
+    .sticker-panel.active { display: grid; }
+    .sticker-item { font-size: 34px; cursor: pointer; padding: 6px; text-align: center; transition: 0.2s; border-radius: 12px; }
+    .sticker-item:hover { background: var(--hover-row); transform: scale(1.15); }
+    .modal-overlay {
+      position: fixed; top:0;left:0;right:0;bottom:0;
+      background: var(--overlay); z-index: 30;
+      display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-card {
+      background: var(--header-bg); padding: 28px 26px; border-radius: 28px;
+      text-align: center; max-width: 340px; width: 90%;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+    }
+    .modal-card h3 { margin-bottom: 20px; font-weight: 700; font-size: 20px; }
+    .setting-row { display: flex; align-items: center; justify-content: space-between; margin: 16px 0; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .setting-row:last-of-type { border-bottom: none; }
+    .setting-row span { font-size: 15px; font-weight: 500; }
+    .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; border-radius: 34px; transition: .4s; }
+    .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: .4s; }
+    input:checked + .slider { background-color: var(--accent); }
+    input:checked + .slider:before { transform: translateX(22px); }
+    .pic-upload { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .upload-btn { background: var(--accent); color: white; padding: 8px 18px; border-radius: 20px; font-size: 13px; cursor: pointer; display: inline-block; transition: 0.2s; }
+    .upload-btn:hover { background: var(--accent-hover); }
+    .modal-actions { display: flex; gap: 12px; margin-top: 20px; justify-content: center; }
+    .modal-actions .btn, .modal-actions .btn-outline { width: auto; padding: 12px 24px; }
+    .call-modal { position: fixed; top:0;left:0;right:0;bottom:0; background: #000; z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; }
+    .call-modal.active { display: flex; }
+    .call-container { width: 90%; max-width: 400px; display: flex; flex-direction: column; gap: 12px; }
+    video { width: 100%; border-radius: 16px; background: #222; }
+    .call-controls { display: flex; gap: 16px; justify-content: center; }
+    .image-preview-overlay {
+      position: fixed; top:0; left:0; right:0; bottom:0;
+      background: rgba(0,0,0,0.8); z-index: 55;
+      display: none; align-items: center; justify-content: center;
+    }
+    .image-preview-overlay img { max-width: 90%; max-height: 90%; border-radius: 20px; }
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+  </style>
 </head>
 <body>
-<div class="app-container" id="appContainer">
-    <!-- LOGIN -->
-    <div class="screen auth-screen active" id="loginScreen">
-        <div class="auth-card">
-            <div class="logo">🔐</div><h2>Kirish</h2><p class="subtitle">Faqat 2 kishi uchun maxfiy chat</p>
-            <label>Login</label><input type="text" id="loginInput" placeholder="Loginni kiriting" autocomplete="off">
-            <label>Parol</label><input type="password" id="passwordInput" placeholder="Parolni kiriting">
-            <p class="error-msg" id="loginError"></p>
-            <button class="btn" id="loginBtn">➡️ Davom etish</button>
-            <p class="hint">user_1 / user_2</p>
+  <div id="app">
+    <!-- Login Screen -->
+    <div id="login-screen">
+      <div class="login-card">
+        <img src="logo1.png" alt="Logo" class="login-logo" onerror="this.style.display='none'; document.getElementById('globeFallback').style.display='block';">
+        <div id="globeFallback" class="globe-fallback" style="display:none;">🌐</div>
+        <div id="step1" class="step active">
+          <input type="text" id="username" placeholder="Login" autocomplete="off">
+          <input type="password" id="password" placeholder="Parol">
+          <button class="btn" id="nextBtn">Davom etish</button>
+          <div class="error" id="loginError"></div>
         </div>
-    </div>
-    <!-- 2FA -->
-    <div class="screen auth-screen" id="twoFAScreen">
-        <div class="auth-card">
-            <div class="logo">🛡️</div><h2>2-Bosqichli Tekshiruv</h2>
-            <p class="subtitle" id="twoFAUserLabel">Maxfiy kodni kiriting</p>
-            <label>Tasdiqlash kodi</label><input type="password" id="twoFAInput" placeholder="Kodni kiriting" autocomplete="off">
-            <p class="error-msg" id="twoFAError"></p>
-            <button class="btn" id="twoFABtn">✅ Tasdiqlash</button>
-            <button class="btn" style="background:#f1f3f4;color:#333;margin-top:8px;" id="backToLoginBtn">⬅️ Orqaga</button>
+        <div id="step2" class="step">
+          <p style="margin-bottom:12px;">Maxfiy kalit so'zni kiriting</p>
+          <input type="password" id="keyword" placeholder="Keyword">
+          <button class="btn" id="loginBtn">Kirish</button>
+          <div class="error" id="keywordError"></div>
         </div>
+      </div>
     </div>
-    <!-- CHAT -->
-    <div class="screen" id="chatScreen">
-        <div class="chat-header">
-            <div class="back-btn" id="logoutBtn">←</div>
-            <div class="avatar" id="otherAvatar">?</div>
-            <div class="user-info">
-                <div class="user-name" id="otherUserName">...</div>
-                <div class="user-status" id="otherUserStatus">oflayn</div>
-            </div>
-            <div class="call-btns">
-                <button class="call-btn audio-call" id="audioCallBtn">📞</button>
-                <button class="call-btn video-call" id="videoCallBtn">📹</button>
-            </div>
-        </div>
-        <div class="messages-container" id="messagesContainer"></div>
-        <div class="input-area" id="inputArea">
-            <button class="attach-btn" id="attachBtn">📎</button>
-            <div class="attach-menu" id="attachMenu">
-                <button id="sendImageBtn">🖼️ Rasm</button>
-                <button id="sendVideoBtn">🎬 Video</button>
-                <button id="sendAudioFileBtn">🎵 Audio fayl</button>
-                <button id="recordVoiceBtn">🎤 Ovozli xabar</button>
-            </div>
-            <textarea id="messageInput" rows="1" placeholder="Xabar yozing..."></textarea>
-            <button class="send-btn" id="sendBtn" disabled>➤</button>
-            <input type="file" id="imageFileInput" accept="image/*" style="display:none">
-            <input type="file" id="videoFileInput" accept="video/*" style="display:none">
-            <input type="file" id="audioFileInput" accept="audio/*" style="display:none">
-        </div>
-    </div>
-    <!-- VIDEO CALL MODAL -->
-    <div class="call-modal" id="videoCallModal">
-        <video class="remote-video" id="remoteVideo" autoplay playsinline></video>
-        <video class="local-video" id="localVideo" autoplay playsinline muted></video>
-        <p class="call-status" id="videoCallStatus">Video chat ulanish kutilmoqda...</p>
-        <div class="call-controls">
-            <button class="ctrl-btn mute-btn" id="videoMuteBtn">🎙️</button>
-            <button class="ctrl-btn end-call" id="endVideoCallBtn">📴</button>
-        </div>
-    </div>
-    <!-- AUDIO CALL MODAL -->
-    <div class="call-modal" id="audioCallModal">
-        <div style="color:#fff;font-size:60px;">📞</div>
-        <p class="call-status" id="audioCallStatus">Audio chat ulanish kutilmoqda...</p>
-        <div class="call-controls">
-            <button class="ctrl-btn mute-btn" id="audioMuteBtn">🎙️</button>
-            <button class="ctrl-btn end-call" id="endAudioCallBtn">📴</button>
-        </div>
-    </div>
-    <!-- POPUP & TOAST -->
-    <div class="msg-popup" id="msgPopup">
-        <button id="editMsgBtn">✏️ Tahrirlash</button>
-        <button class="delete-opt" id="deleteMsgBtn">🗑️ Oʻchirish</button>
-    </div>
-    <div class="toast" id="toast"></div>
-</div>
 
-<script>
-    // ===================== FIREBASE CONFIG =====================
+    <!-- Chat Screen -->
+    <div id="chat-screen">
+      <div id="chat-header">
+        <div class="profile-pic" id="partnerPic"></div>
+        <div class="header-info">
+          <div class="header-name" id="partnerName"></div>
+          <div class="header-status" id="partnerStatus"><span class="online-dot"></span> hozir online 🟢</div>
+        </div>
+        <div class="header-actions">
+          <button class="icon-btn" id="callBtn" title="Qo'ng'iroq">📞</button>
+          <button class="icon-btn" id="settingsBtn" title="Sozlamalar">⚙️</button>
+        </div>
+      </div>
+      <div id="typing-indicator"></div>
+      <div id="messages"></div>
+      <div id="input-area">
+        <button class="icon-btn" id="attachBtn">📎</button>
+        <input type="text" id="message-input" placeholder="Xabar yozing..." autocomplete="off">
+        <button class="icon-btn" id="stickerBtn">😀</button>
+        <button class="icon-btn" id="voiceBtn">🎤</button>
+        <button class="icon-btn" id="sendBtn">➤</button>
+      </div>
+      <input type="file" id="fileInput" accept="image/*,video/*" style="display:none">
+      <div class="sticker-panel" id="stickerPanel"></div>
+    </div>
+
+    <!-- Call Modal -->
+    <div class="call-modal" id="callModal">
+      <div class="call-container">
+        <video id="remoteVideo" autoplay playsinline></video>
+        <video id="localVideo" autoplay playsinline muted></video>
+        <div class="call-controls">
+          <button class="btn" id="hangupBtn">📴 Yakunlash</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Call Type Selection Modal -->
+    <div class="modal-overlay" id="callTypeModal">
+      <div class="modal-card">
+        <h3>Qo'ng'iroq turi</h3>
+        <button class="btn" id="audioCallBtn">🎵 Audio qo'ng'iroq</button>
+        <button class="btn" id="videoCallBtn">📹 Video qo'ng'iroq</button>
+        <button class="btn-outline" id="cancelCallTypeBtn">Bekor qilish</button>
+      </div>
+    </div>
+
+    <!-- Incoming Call Modal -->
+    <div class="modal-overlay" id="incomingCallModal">
+      <div class="modal-card">
+        <h3 id="incomingCallTitle">📞 Qo'ng'iroq...</h3>
+        <p id="incomingCallInfo"></p>
+        <div class="modal-actions">
+          <button class="btn" id="acceptCallBtn">✅ Qabul qilish</button>
+          <button class="btn-outline" id="declineCallBtn">❌ Rad etish</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Picture Preview Overlay -->
+    <div class="image-preview-overlay" id="imagePreview">
+      <img src="" alt="Profil rasmi" id="previewImg">
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+      <div class="modal-card">
+        <h3>Sozlamalar</h3>
+        <div class="setting-row">
+          <span>🌙 Dark rejim</span>
+          <label class="switch">
+            <input type="checkbox" id="darkToggle">
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <span>📷 Profil rasmi</span>
+          <div class="pic-upload">
+            <label for="picUpload" class="upload-btn">Rasm tanlash</label>
+            <input type="file" id="picUpload" accept="image/*" style="display:none;">
+          </div>
+        </div>
+        <button class="btn-outline" id="savePicBtn" style="margin:10px 0;">💾 Rasmni saqlash</button>
+        <div class="modal-actions">
+          <button class="btn" id="logoutBtn" style="background:var(--danger);">🔒 Chiqish</button>
+          <button class="btn-outline" id="closeSettingsBtn">Yopish</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Yangi Popup Menyu – endi #app tashqarisida, body ichida -->
+  <div class="msg-popup" id="msgPopup">
+    <button id="copyMsgBtn">📋 Nusxalash</button>
+    <button id="replyMsgBtn">↩️ Reply</button>
+    <button id="editMsgBtn" style="display:none;">✏️ Tahrirlash</button>
+    <button class="delete-opt" id="deleteMsgBtn" style="display:none;">🗑️ O‘chirish</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, push, set, onChildAdded, onChildChanged, onChildRemoved, onValue, update, remove, serverTimestamp, onDisconnect } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
     const firebaseConfig = {
         apiKey: "AIzaSyC8ZNN4-AQ0dp1DyTkXi8v0URrQ9U6BL0",
         authDomain: "chat-3a98a.firebaseapp.com",
@@ -263,402 +458,610 @@
         measurementId: "G-ZRVVN55E2M",
         databaseURL: "https://chat-3a98a-default-rtdb.firebaseio.com"
     };
-    // ==========================================================
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-    // ---------- USER DATA ----------
     const USERS = {
-        'user_1': { password: 'u.s.e.r_1', nickname: 'Jasurbek' },
-        'user_2': { password: 'u.s.e.r_2', nickname: 'Dilnura' }
+      user_1: { username: 'user_1', password: 'u.s.e.r_1', nickname: 'Jasurbek' },
+      user_2: { username: 'user_2', password: 'u.s.e.r_2', nickname: 'Dilnura' }
     };
-    const TWO_FA_CODE = 'only2';
+    const KEYWORD = 'only2';
 
-    let currentUser = null; // { login, password, nickname }
-    const $ = (sel) => document.querySelector(sel);
-
-    // ---------- HELPERS ----------
-    function showToast(msg) {
-        const t = $('#toast');
-        t.textContent = msg; t.classList.add('show');
-        clearTimeout(t._timeout);
-        t._timeout = setTimeout(() => t.classList.remove('show'), 2500);
-    }
-    function formatTime(ts) {
-        const d = new Date(ts);
-        const hh = String(d.getHours()).padStart(2,'0');
-        const mm = String(d.getMinutes()).padStart(2,'0');
-        if (d.toDateString() === new Date().toDateString()) return `Bugun ${hh}:${mm}`;
-        const dd = String(d.getDate()).padStart(2,'0');
-        const mon = String(d.getMonth()+1).padStart(2,'0');
-        return `${dd}.${mon}.${d.getFullYear()} ${hh}:${mm}`;
-    }
-    function getOtherUser() {
-        if (!currentUser) return null;
-        return currentUser.login === 'user_1' ? {login:'user_2', ...USERS['user_2']} : {login:'user_1', ...USERS['user_1']};
-    }
-    function generateId() { return 'msg_'+Date.now()+'_'+Math.random().toString(36).substr(2,6); }
-
-    // ---------- AUTH ----------
-    function showScreen(id) {
-        ['loginScreen','twoFAScreen','chatScreen'].forEach(s => $('#'+s).classList.remove('active'));
-        $('#'+id).classList.add('active');
-    }
-    $('#loginBtn').onclick = () => {
-        const login = $('#loginInput').value.trim();
-        const pass = $('#passwordInput').value;
-        $('#loginError').textContent = '';
-        if (!USERS[login]) { $('#loginError').textContent = '❌ Bunday foydalanuvchi mavjud emas'; return; }
-        if (USERS[login].password !== pass) { $('#loginError').textContent = '❌ Parol noto\'g\'ri'; return; }
-        currentUser = { login, password: pass, nickname: USERS[login].nickname };
-        $('#twoFAUserLabel').textContent = USERS[login].nickname + ', maxfiy kodni kiriting';
-        $('#twoFAInput').value = ''; $('#twoFAError').textContent = '';
-        showScreen('twoFAScreen'); $('#twoFAInput').focus();
-    };
-    $('#twoFABtn').onclick = () => {
-        const code = $('#twoFAInput').value.trim();
-        $('#twoFAError').textContent = '';
-        if (code !== TWO_FA_CODE) { $('#twoFAError').textContent = '❌ Kod noto\'g\'ri. "only2"'; return; }
-        initChat();
-    };
-    $('#backToLoginBtn').onclick = () => { currentUser = null; showScreen('loginScreen'); };
-    $('#logoutBtn').onclick = logout;
-
-    // ---------- CHAT INIT ----------
-    function initChat() {
-        showScreen('chatScreen');
-        $('#otherUserName').textContent = getOtherUser().nickname;
-        $('#otherAvatar').textContent = getOtherUser().nickname.charAt(0);
-        listenMessages();
-        listenPresence();
-        updateMyPresence(true);
-        $('#messageInput').focus();
-
-        // Heartbeat for online status
-        const presenceRef = db.ref(`status/${currentUser.login}`);
-        db.ref('.info/connected').on('value', snap => {
-            if (snap.val() === true) {
-                presenceRef.onDisconnect().set({ online: false, lastSeen: firebase.database.ServerValue.TIMESTAMP });
-                presenceRef.set({ online: true, lastSeen: firebase.database.ServerValue.TIMESTAMP });
-            }
-        });
-    }
-
-    function logout() {
-        if (currentUser) {
-            db.ref(`status/${currentUser.login}`).set({ online: false, lastSeen: firebase.database.ServerValue.TIMESTAMP });
-        }
-        // Stop listeners
-        db.ref('messages').off();
-        db.ref(`status/${getOtherUser()?.login}`).off();
-        currentUser = null;
-        $('#messagesContainer').innerHTML = '';
-        showScreen('loginScreen');
-    }
-
-    // ---------- MESSAGES (FIREBASE) ----------
-    function listenMessages() {
-        const container = $('#messagesContainer');
-        db.ref('messages').off(); // clear previous
-        db.ref('messages').on('child_added', snap => {
-            const msg = snap.val();
-            renderMessage(msg);
-            container.scrollTop = container.scrollHeight;
-        });
-        db.ref('messages').on('child_changed', snap => {
-            // re-render edited / seen
-            const msg = snap.val();
-            const el = document.querySelector(`[data-id="${msg.id}"]`);
-            if (el) el.remove();
-            renderMessage(msg);
-        });
-        db.ref('messages').on('child_removed', snap => {
-            const el = document.querySelector(`[data-id="${snap.val().id}"]`);
-            if (el) el.remove();
-        });
-    }
-
-    function renderMessage(msg) {
-        const container = $('#messagesContainer');
-        const wrapper = document.createElement('div');
-        wrapper.className = 'msg-wrapper ' + (msg.sender === currentUser.login ? 'sent' : 'received');
-        wrapper.dataset.id = msg.id;
-        const bubble = document.createElement('div');
-        bubble.className = 'msg-bubble';
-        if (msg.type === 'text') bubble.textContent = msg.content;
-        else if (msg.type === 'image') {
-            const img = document.createElement('img'); img.src = msg.content; img.onclick = ()=> window.open(msg.content);
-            bubble.appendChild(img);
-        } else if (msg.type === 'video') {
-            const vid = document.createElement('video'); vid.src = msg.content; vid.controls = true;
-            bubble.appendChild(vid);
-        } else if (msg.type === 'audio') {
-            const aud = document.createElement('audio'); aud.src = msg.content; aud.controls = true;
-            bubble.appendChild(aud);
-        }
-        wrapper.appendChild(bubble);
-        const meta = document.createElement('div');
-        meta.className = 'msg-meta';
-        let text = formatTime(msg.timestamp);
-        if (msg.edited) text += ' · <span class="edited-tag">tahrirlangan</span>';
-        if (msg.sender === currentUser.login && msg.seenAt) {
-            text += ` · <span class="seen-status">✅ ${formatTime(msg.seenAt).split(' ').pop()}</span>`;
-        } else if (msg.sender === currentUser.login) text += ' · <span style="color:#999;">✓</span>';
-        meta.innerHTML = text;
-        wrapper.appendChild(meta);
-        // double click for own messages
-        if (msg.sender === currentUser.login) {
-            wrapper.ondblclick = (e) => {
-                selectedMsgId = msg.id;
-                showMsgPopup(e.clientX, e.clientY);
-            };
-            let timer;
-            wrapper.ontouchstart = (e) => {
-                timer = setTimeout(() => {
-                    selectedMsgId = msg.id;
-                    const t = e.touches[0];
-                    showMsgPopup(t.clientX, t.clientY);
-                }, 600);
-            };
-            wrapper.ontouchend = () => clearTimeout(timer);
-            wrapper.ontouchmove = () => clearTimeout(timer);
-        }
-        container.appendChild(wrapper);
-        // mark seen for received messages
-        if (msg.sender !== currentUser.login && !msg.seenAt) {
-            db.ref(`messages/${msg.id}`).update({ seenAt: firebase.database.ServerValue.TIMESTAMP });
-        }
-    }
-
-    function sendMessage(content, type='text') {
-        if (!currentUser || !content.trim()) return;
-        const msg = {
-            id: generateId(),
-            sender: currentUser.login,
-            content: content.trim(),
-            type: type,
-            timestamp: firebase.database.ServerValue.TIMESTAMP,
-            edited: false,
-            seenAt: null
-        };
-        db.ref(`messages/${msg.id}`).set(msg);
-        $('#messageInput').value = ''; $('#sendBtn').disabled = true;
-        $('#messageInput').style.height = 'auto';
-    }
-
-    // Edit / Delete
+    let currentUser = null;
+    let partner = null;
+    let messages = [];
+    let replyTarget = null;
+    let chatActive = false;
     let selectedMsgId = null;
-    function showMsgPopup(x,y) {
-        const pop = $('#msgPopup');
-        pop.style.top = Math.min(y, window.innerHeight-120)+'px';
-        pop.style.left = Math.min(x, window.innerWidth-160)+'px';
-        pop.classList.add('show');
-        setTimeout(() => {
-            const close = () => { pop.classList.remove('show'); document.removeEventListener('click', close); };
-            document.addEventListener('click', close, {once:true});
-        }, 50);
-    }
-    $('#editMsgBtn').onclick = () => {
-        $('#msgPopup').classList.remove('show');
-        if (selectedMsgId) {
-            db.ref(`messages/${selectedMsgId}`).once('value').then(snap => {
-                const msg = snap.val();
-                if (msg && msg.type === 'text') {
-                    const newText = prompt('Tahrirlash:', msg.content);
-                    if (newText !== null && newText.trim()) {
-                        db.ref(`messages/${selectedMsgId}`).update({ content: newText.trim(), edited: true, timestamp: firebase.database.ServerValue.TIMESTAMP });
-                    }
-                } else showToast('Faqat matnli xabarlarni tahrirlash mumkin');
-                selectedMsgId = null;
-            });
-        }
-    };
-    $('#deleteMsgBtn').onclick = () => {
-        $('#msgPopup').classList.remove('show');
-        if (selectedMsgId && confirm('Oʻchirishni istaysizmi?')) {
-            db.ref(`messages/${selectedMsgId}`).remove();
-        }
-        selectedMsgId = null;
-    };
+    let popupCloseHandler = null;
+    let popupTimeout = null;
+    let incomingCallData = null;
+    let incomingCallTimer = null;
 
-    // File uploads
-    $('#sendBtn').onclick = () => { const t = $('#messageInput').value.trim(); if(t) sendMessage(t); };
-    $('#messageInput').oninput = function() {
-        $('#sendBtn').disabled = this.value.trim() === '';
-        this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight,100)+'px';
-    };
-    $('#messageInput').onkeydown = function(e) {
-        if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); const t=this.value.trim(); if(t) sendMessage(t); }
-    };
-    $('#attachBtn').onclick = (e) => { e.stopPropagation(); $('#attachMenu').classList.toggle('show'); };
-    document.addEventListener('click', () => $('#attachMenu').classList.remove('show'));
-    $('#sendImageBtn').onclick = () => { $('#imageFileInput').click(); };
-    $('#sendVideoBtn').onclick = () => { $('#videoFileInput').click(); };
-    $('#sendAudioFileBtn').onclick = () => { $('#audioFileInput').click(); };
-    $('#recordVoiceBtn').onclick = toggleRecording;
+    const loginScreen = document.getElementById('login-screen');
+    const chatScreen = document.getElementById('chat-screen');
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const keywordInput = document.getElementById('keyword');
+    const loginError = document.getElementById('loginError');
+    const keywordError = document.getElementById('keywordError');
+    const partnerNameEl = document.getElementById('partnerName');
+    const partnerStatusEl = document.getElementById('partnerStatus');
+    const partnerPic = document.getElementById('partnerPic');
+    const messagesDiv = document.getElementById('messages');
+    const messageInput = document.getElementById('message-input');
+    const typingIndicator = document.getElementById('typing-indicator');
+    const stickerPanel = document.getElementById('stickerPanel');
+    const callModal = document.getElementById('callModal');
+    const remoteVideo = document.getElementById('remoteVideo');
+    const localVideo = document.getElementById('localVideo');
+    const settingsModal = document.getElementById('settingsModal');
+    const darkToggle = document.getElementById('darkToggle');
+    const fileInput = document.getElementById('fileInput');
+    const picUpload = document.getElementById('picUpload');
+    const msgPopup = document.getElementById('msgPopup');
+    const copyBtn = document.getElementById('copyMsgBtn');
+    const replyBtn = document.getElementById('replyMsgBtn');
+    const editBtn = document.getElementById('editMsgBtn');
+    const deleteBtn = document.getElementById('deleteMsgBtn');
+    const callTypeModal = document.getElementById('callTypeModal');
+    const incomingCallModal = document.getElementById('incomingCallModal');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
 
-    function handleFile(file, type) {
-        if (!file) return;
-        if (file.size > 8*1024*1024) { showToast('Fayl 8MB dan kichik boʻlishi kerak'); return; }
-        const reader = new FileReader();
-        reader.onload = e => sendMessage(e.target.result, type);
-        reader.readAsDataURL(file);
-    }
-    $('#imageFileInput').onchange = function() { if(this.files[0]) { handleFile(this.files[0],'image'); this.value=''; } };
-    $('#videoFileInput').onchange = function() { if(this.files[0]) { handleFile(this.files[0],'video'); this.value=''; } };
-    $('#audioFileInput').onchange = function() { if(this.files[0]) { handleFile(this.files[0],'audio'); this.value=''; } };
+    let mediaRecorder;
+    let audioChunks = [];
+    let pc;
+    let localStream;
+    let callActive = false;
+    let typingTimeout;
+    let currentCallType = 'video';
 
-    // Voice recording
-    let mediaRecorder, audioChunks, isRecording = false;
-    async function toggleRecording() {
-        if (isRecording) {
-            mediaRecorder.stop();
-            isRecording = false;
-            $('#recordVoiceBtn').textContent = '🎤';
-        } else {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
-                audioChunks = [];
-                mediaRecorder.ondataavailable = e => { if(e.data.size>0) audioChunks.push(e.data); };
-                mediaRecorder.onstop = () => {
-                    const blob = new Blob(audioChunks, { type: 'audio/webm' });
-                    const reader = new FileReader();
-                    reader.onload = e => sendMessage(e.target.result, 'audio');
-                    reader.readAsDataURL(blob);
-                    stream.getTracks().forEach(t=>t.stop());
-                    $('#recordVoiceBtn').textContent = '🎤';
-                };
-                mediaRecorder.start();
-                isRecording = true;
-                $('#recordVoiceBtn').textContent = '⏹️';
-            } catch (err) { showToast('Mikrofon ruxsati yoʻq'); }
-        }
+    function getProfilePic(username) { return localStorage.getItem(`profile_${username}`) || ''; }
+    function setProfilePic(username, base64) { localStorage.setItem(`profile_${username}`, base64); }
+    function updatePartnerProfile() {
+      if (!partner) return;
+      const pic = getProfilePic(partner.username);
+      partnerPic.innerHTML = pic ? `<img src="${pic}" alt="profile">` : partner.nickname.charAt(0);
+      partnerPic.style.background = pic ? 'none' : '#6b7b8b';
     }
+    function applyTheme() {
+      const dark = localStorage.getItem('dark') === 'true';
+      document.body.classList.toggle('dark', dark);
+      if (darkToggle) darkToggle.checked = dark;
+      updateBodyBackground();
+    }
+    function updateBodyBackground() {
+      if (!currentUser) return;
+      const isDark = document.body.classList.contains('dark');
+      const userNum = currentUser.username === 'user_1' ? '1' : '2';
+      const mode = isDark ? 'd' : 'l';
+      const imageName = `${userNum}${mode}.png`;
+      document.body.style.backgroundImage = `url('${imageName}')`;
+    }
+    darkToggle.addEventListener('change', () => { localStorage.setItem('dark', darkToggle.checked); applyTheme(); });
+    function getMessageById(id) { return messages.find(m => m.id === id); }
 
-    // ---------- PRESENCE ----------
-    function listenPresence() {
-        const other = getOtherUser();
-        if (!other) return;
-        const statusRef = db.ref(`status/${other.login}`);
-        statusRef.on('value', snap => {
-            const data = snap.val();
-            if (data) {
-                const online = data.online;
-                $('#otherUserStatus').textContent = online ? 'hozir online 🟢' : 'oxirgi marta: ' + formatLastSeen(data.lastSeen);
-                $('#otherUserStatus').className = 'user-status' + (online ? '' : ' offline');
-            }
-        });
-    }
-    function updateMyPresence(online) {
-        if (!currentUser) return;
-        db.ref(`status/${currentUser.login}`).update({ online, lastSeen: firebase.database.ServerValue.TIMESTAMP });
-    }
+    function formatTime(ts) { if (!ts) return ''; return new Date(ts).toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' }); }
     function formatLastSeen(ts) {
-        if (!ts) return 'nomaʼlum';
-        const diff = Date.now() - ts;
-        if (diff < 15000) return 'hozirgina';
-        if (diff < 60000) return 'bir daqiqa oldin';
-        if (diff < 3600000) return Math.floor(diff/60000)+' daqiqa oldin';
-        if (diff < 86400000) return Math.floor(diff/3600000)+' soat oldin';
-        return formatTime(ts);
+      if (!ts) return 'nomaʼlum';
+      const diff = Date.now() - ts;
+      if (diff < 15000) return 'hozirgina';
+      if (diff < 60000) return 'bir daqiqa oldin';
+      if (diff < 3600000) return Math.floor(diff / 60000) + ' daqiqa oldin';
+      if (diff < 86400000) return Math.floor(diff / 3600000) + ' soat oldin';
+      return formatTime(ts);
     }
 
-    // ---------- WEBRTC (Video/Audio) via Firebase signaling ----------
-    let localStream, pc, callType = null;
-    const signalingRef = db.ref('signaling');
-
-    async function startCall(type) {
-        callType = type;
-        try {
-            const constraints = { audio: true, video: type==='video' };
-            localStream = await navigator.mediaDevices.getUserMedia(constraints);
-            if (type==='video') {
-                $('#localVideo').srcObject = localStream;
-                $('#videoCallModal').classList.add('active');
-            } else {
-                $('#audioCallModal').classList.add('active');
-            }
-            pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
-            localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
-            pc.onicecandidate = event => {
-                if (event.candidate) {
-                    signalingRef.push({ type: 'candidate', candidate: event.candidate, from: currentUser.login, callType });
-                }
-            };
-            pc.ontrack = event => {
-                if (callType==='video') {
-                    $('#remoteVideo').srcObject = event.streams[0];
-                } else {
-                    const audio = new Audio(); audio.srcObject = event.streams[0]; audio.play();
-                }
-            };
-            pc.onconnectionstatechange = () => {
-                if (pc.connectionState === 'connected') showToast('Ulanish oʻrnatildi ✅');
-                else if (pc.connectionState === 'failed') showToast('Aloqa uzildi ❌');
-            };
-            const offer = await pc.createOffer();
-            await pc.setLocalDescription(offer);
-            signalingRef.push({ type: 'offer', sdp: offer, from: currentUser.login, callType });
-            // Listen for answer & candidates
-            signalingRef.on('child_added', handleSignaling);
-        } catch (err) { showToast('Kamera/mikrofon ruxsati yoʻq'); endCall(); }
+    function setBodyBackground(imageFile) {
+      document.body.style.backgroundImage = `url('${imageFile}')`;
     }
 
-    function handleSignaling(snap) {
-        const data = snap.val();
-        if (!data || data.from === currentUser.login || data.callType !== callType) return;
-        if (data.type === 'offer' && pc) {
-            pc.setRemoteDescription(new RTCSessionDescription(data.sdp)).then(() => {
-                return pc.createAnswer();
-            }).then(answer => {
-                return pc.setLocalDescription(answer);
-            }).then(() => {
-                signalingRef.push({ type: 'answer', sdp: pc.localDescription, from: currentUser.login, callType });
-            });
-        } else if (data.type === 'answer' && pc) {
-            pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
-        } else if (data.type === 'candidate' && pc) {
-            pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+    function setupPresenceSystem() {
+      const presenceRef = ref(db, `status/${currentUser.username}`);
+      const connectedRef = ref(db, '.info/connected');
+      onValue(connectedRef, (snap) => {
+        if (snap.val() === true) {
+          onDisconnect(presenceRef).set({ online: false, lastSeen: serverTimestamp() });
+          set(presenceRef, { online: true, lastSeen: serverTimestamp() });
+        } else {
+          set(presenceRef, { online: false, lastSeen: serverTimestamp() });
         }
-        // Clean old signaling messages (optional)
+      });
     }
+    async function sendPresence(online) {
+      if (!currentUser) return;
+      await set(ref(db, `status/${currentUser.username}`), { online: online, lastSeen: serverTimestamp() });
+    }
+    function listenPresence() {
+      if (!partner) return;
+      const statusRef = ref(db, `status/${partner.username}`);
+      onValue(statusRef, (snap) => {
+        const data = snap.val();
+        if (!data) { partnerStatusEl.innerHTML = 'offline'; return; }
+        if (data.online) {
+          partnerStatusEl.innerHTML = '<span class="online-dot"></span> hozir online 🟢';
+        } else {
+          const text = data.lastSeen ? formatLastSeen(data.lastSeen) : 'offline';
+          partnerStatusEl.innerHTML = `oxirgi marta: ${text}`;
+        }
+      });
+    }
+
+    function startListeners() {
+      const messagesRef = ref(db, 'messages');
+      onChildAdded(messagesRef, (snapshot) => {
+        const msg = snapshot.val(); msg.id = snapshot.key;
+        if (!msg.timestamp) msg.timestamp = Date.now();
+        messages.push(msg);
+        renderMessages();
+        if (msg.sender === partner.username && chatActive && !msg.seenAt) {
+          update(ref(db, `messages/${msg.id}`), { seenAt: serverTimestamp() });
+        }
+      });
+      onChildChanged(messagesRef, (snapshot) => {
+        const changedMsg = snapshot.val(); changedMsg.id = snapshot.key;
+        const index = messages.findIndex(m => m.id === changedMsg.id);
+        if (index !== -1) { messages[index] = { ...messages[index], ...changedMsg }; renderMessages(); }
+      });
+      onChildRemoved(messagesRef, (snapshot) => {
+        const deletedId = snapshot.key;
+        messages = messages.filter(m => m.id !== deletedId);
+        renderMessages();
+        if (replyTarget && replyTarget.id === deletedId) clearReply();
+      });
+      const typingRef = ref(db, `typing/${partner.username}`);
+      onValue(typingRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          if (data.status === 'typing') { typingIndicator.textContent = 'typing...'; typingIndicator.style.display = 'block'; }
+          else if (data.status === 'sending_picture') { typingIndicator.textContent = 'sending picture...'; typingIndicator.style.display = 'block'; }
+          else if (data.status === 'sending_video') { typingIndicator.textContent = 'sending video...'; typingIndicator.style.display = 'block'; }
+          else if (data.status === 'sending_audio') { typingIndicator.textContent = 'sending audio...'; typingIndicator.style.display = 'block'; }
+          else { typingIndicator.style.display = 'none'; }
+        } else { typingIndicator.style.display = 'none'; }
+      });
+      listenPresence();
+      const callRef = ref(db, 'calls/current');
+      onValue(callRef, async (snapshot) => {
+        const data = snapshot.val();
+        if (!data || !partner || data.from === currentUser.username) return;
+        if (data.type === 'offer') {
+          showIncomingCall(data);
+        } else if (data.type === 'answer') {
+          if (pc) await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+          hideIncomingCall();
+        } else if (data.type === 'candidate') {
+          if (pc) {
+            try { await pc.addIceCandidate(new RTCIceCandidate(data.candidate)); } catch(e) {}
+          }
+        } else if (data.type === 'reject' || data.type === 'hangup') {
+          endCall();
+          hideIncomingCall();
+        }
+      });
+      const profileRef = ref(db, `profiles/${partner.username}`);
+      onValue(profileRef, (snapshot) => {
+        const base64 = snapshot.val();
+        if (base64) setProfilePic(partner.username, base64);
+        else localStorage.removeItem(`profile_${partner.username}`);
+        updatePartnerProfile();
+      });
+    }
+
+    // Popup menyu – ishonchli ishlaydi
+    function showMsgPopup(x, y, msg) {
+      if (popupCloseHandler) {
+        document.removeEventListener('click', popupCloseHandler);
+        popupCloseHandler = null;
+      }
+      clearTimeout(popupTimeout);
+      selectedMsgId = msg.id;
+      const isMe = msg.sender === currentUser.username;
+      editBtn.style.display = isMe && msg.type === 'text' ? 'block' : 'none';
+      deleteBtn.style.display = isMe ? 'block' : 'none';
+
+      // Avval display block, lekin ko'rinmas, o'lcham olamiz
+      msgPopup.style.display = 'block';
+      msgPopup.style.visibility = 'hidden';
+      const w = msgPopup.offsetWidth;
+      const h = msgPopup.offsetHeight;
+      // Ko'rinadigan holga keltiramiz
+      msgPopup.style.visibility = 'visible';
+
+      let left = Math.min(x, window.innerWidth - w - 10);
+      let top = Math.min(y, window.innerHeight - h - 10);
+      left = Math.max(10, left);
+      top = Math.max(10, top);
+
+      msgPopup.style.top = top + 'px';
+      msgPopup.style.left = left + 'px';
+
+      popupTimeout = setTimeout(() => {
+        popupCloseHandler = (e) => {
+          if (!msgPopup.contains(e.target)) {
+            hideMsgPopup();
+          }
+        };
+        document.addEventListener('click', popupCloseHandler);
+      }, 200);
+    }
+
+    function hideMsgPopup() {
+      msgPopup.style.display = 'none';
+      msgPopup.style.visibility = '';
+      if (popupCloseHandler) {
+        document.removeEventListener('click', popupCloseHandler);
+        popupCloseHandler = null;
+      }
+    }
+
+    function addMessageMenu(row, msg) {
+      row.addEventListener('dblclick', (e) => {
+        e.preventDefault();
+        showMsgPopup(e.clientX, e.clientY, msg);
+      });
+
+      let touchTimer;
+      row.addEventListener('touchstart', (e) => {
+        touchTimer = setTimeout(() => {
+          const touch = e.touches[0];
+          showMsgPopup(touch.clientX, touch.clientY, msg);
+        }, 500);
+      });
+      row.addEventListener('touchend', () => clearTimeout(touchTimer));
+      row.addEventListener('touchmove', () => clearTimeout(touchTimer));
+
+      row.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        showMsgPopup(e.clientX, e.clientY, msg);
+      });
+
+      // Uch nuqta tugmasi
+      const optionsBtn = document.createElement('span');
+      optionsBtn.className = 'msg-options';
+      optionsBtn.innerHTML = '⋮';
+      optionsBtn.title = 'Xabar amallari';
+      optionsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const rect = optionsBtn.getBoundingClientRect();
+        showMsgPopup(rect.left + rect.width/2, rect.top - 5, msg);
+      });
+      row.appendChild(optionsBtn);
+    }
+
+    copyBtn.addEventListener('click', () => {
+      hideMsgPopup();
+      const msg = getMessageById(selectedMsgId);
+      if (msg) {
+        const text = (msg.type === 'text' || msg.type === 'sticker') ? msg.content : '';
+        navigator.clipboard.writeText(text).catch(()=>{});
+      }
+    });
+    replyBtn.addEventListener('click', () => {
+      hideMsgPopup();
+      const msg = getMessageById(selectedMsgId);
+      if (msg) {
+        replyTarget = msg;
+        messageInput.placeholder = 'Javob yozish...';
+        messageInput.focus();
+      }
+    });
+    editBtn.addEventListener('click', () => {
+      hideMsgPopup();
+      const msg = getMessageById(selectedMsgId);
+      if (msg && msg.sender === currentUser.username) {
+        const newText = prompt('Xabarni tahrirlang:', msg.content);
+        if (newText && newText.trim()) {
+          update(ref(db, `messages/${msg.id}`), { content: newText.trim(), edited: true });
+        }
+      }
+    });
+    deleteBtn.addEventListener('click', () => {
+      hideMsgPopup();
+      if (selectedMsgId && confirm('Xabar o‘chirilsinmi?')) {
+        remove(ref(db, `messages/${selectedMsgId}`));
+      }
+    });
+
+    function renderMessages() {
+      messagesDiv.innerHTML = '';
+      messages.forEach(msg => {
+        const isMe = msg.sender === currentUser.username;
+        const row = document.createElement('div');
+        row.className = `message-row ${isMe ? 'me' : 'you'}`;
+        row.dataset.id = msg.id;
+
+        let content = '';
+        if (msg.replyTo) {
+          const replied = getMessageById(msg.replyTo);
+          if (replied) {
+            const replyText = (replied.type === 'text' || replied.type === 'sticker') ? replied.content : '[media]';
+            content += `<div class="bubble reply-preview">${replyText}</div>`;
+          }
+        }
+        if (msg.type === 'text' || msg.type === 'sticker') {
+          content += `<div class="bubble${msg.type==='sticker'?'" style="font-size:40px;background:transparent;box-shadow:none;':''}">${msg.content}${msg.edited?'<span class="edited">(tahrirlangan)</span>':''}</div>`;
+        } else if (msg.type === 'image') {
+          content += `<div class="bubble media-msg"><img src="${msg.fileData}" loading="lazy"></div>`;
+        } else if (msg.type === 'video') {
+          content += `<div class="bubble media-msg"><video controls src="${msg.fileData}"></video></div>`;
+        } else if (msg.type === 'audio') {
+          content += `<div class="bubble audio-msg"><audio controls src="${msg.fileData}"></audio></div>`;
+        }
+
+        const timeStr = msg.timestamp ? formatTime(msg.timestamp) : '';
+        let statusHtml = '';
+        if (isMe) {
+          if (msg.seenAt) {
+            statusHtml = `<span class="msg-status"><span class="seen-icon">✅ Seen</span> ${formatTime(msg.seenAt)}</span>`;
+          } else {
+            statusHtml = '<span class="msg-status" style="color:#999;">✓ Sent</span>';
+          }
+        }
+        content += `<div class="timestamp">${timeStr} ${statusHtml}</div>`;
+        row.innerHTML = content;
+
+        addMessageMenu(row, msg);
+        messagesDiv.appendChild(row);
+      });
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    function clearReply() { replyTarget = null; messageInput.placeholder = 'Xabar yozing...'; }
+
+    async function sendMessage(type, data) {
+      if (!currentUser) return;
+      const msg = { sender: currentUser.username, type, content: '', fileData: null, replyTo: replyTarget ? replyTarget.id : null, edited: false, timestamp: serverTimestamp(), seenAt: null };
+      if (type === 'text' || type === 'sticker') msg.content = data; else msg.fileData = data;
+      await set(push(ref(db, 'messages')), msg);
+      update(ref(db, `typing/${currentUser.username}`), { status: 'idle' });
+      clearReply();
+    }
+
+    messageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        const text = messageInput.value.trim();
+        if (text) { sendMessage('text', text); messageInput.value = ''; }
+      }
+    });
+    messageInput.addEventListener('input', () => {
+      if (messageInput.value.trim()) {
+        update(ref(db, `typing/${currentUser.username}`), { status: 'typing' });
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => update(ref(db, `typing/${currentUser.username}`), { status: 'idle' }), 1500);
+      } else update(ref(db, `typing/${currentUser.username}`), { status: 'idle' });
+    });
+    document.getElementById('sendBtn').addEventListener('click', () => {
+      const text = messageInput.value.trim(); if (text) { sendMessage('text', text); messageInput.value = ''; }
+    });
+
+    document.getElementById('attachBtn').addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files[0]; if (!file) return;
+      const isVideo = file.type.startsWith('video');
+      update(ref(db, `typing/${currentUser.username}`), { status: isVideo ? 'sending_video' : 'sending_picture' });
+      const reader = new FileReader();
+      reader.onload = (e) => sendMessage(isVideo ? 'video' : 'image', e.target.result);
+      reader.readAsDataURL(file); fileInput.value = '';
+    });
+
+    document.getElementById('voiceBtn').addEventListener('click', async () => {
+      if (mediaRecorder && mediaRecorder.state === 'recording') { mediaRecorder.stop(); document.getElementById('voiceBtn').textContent = '🎤'; return; }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        let mimeType = 'audio/webm'; if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/ogg';
+        mediaRecorder = new MediaRecorder(stream, { mimeType });
+        audioChunks = [];
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(audioChunks, { type: mimeType });
+          const reader = new FileReader();
+          reader.onload = (e) => { sendMessage('audio', e.target.result); update(ref(db, `typing/${currentUser.username}`), { status: 'idle' }); };
+          reader.readAsDataURL(blob); stream.getTracks().forEach(t => t.stop()); mediaRecorder = null;
+        };
+        mediaRecorder.start(); document.getElementById('voiceBtn').textContent = '⏹️';
+        update(ref(db, `typing/${currentUser.username}`), { status: 'sending_audio' });
+      } catch (err) { alert('Mikrofon ruxsati kerak'); update(ref(db, `typing/${currentUser.username}`), { status: 'idle' }); }
+    });
+
+    const stickers = ['😀','😅','😂','😍','😎','👍','👋','🎉','❤️','🫶','🔥','🧐','😳','😢','😡','🥳'];
+    document.getElementById('stickerBtn').addEventListener('click', () => stickerPanel.classList.toggle('active'));
+    const sp = document.getElementById('stickerPanel');
+    stickers.forEach(st => {
+      const span = document.createElement('span'); span.className = 'sticker-item'; span.textContent = st;
+      span.onclick = () => { sendMessage('sticker', st); stickerPanel.classList.remove('active'); };
+      sp.appendChild(span);
+    });
+
+    // Qo'ng'iroq tizimi
+    document.getElementById('callBtn').addEventListener('click', () => {
+      if (callActive) return;
+      callTypeModal.classList.add('active');
+    });
+    document.getElementById('audioCallBtn').addEventListener('click', () => {
+      callTypeModal.classList.remove('active');
+      startCall('audio');
+    });
+    document.getElementById('videoCallBtn').addEventListener('click', () => {
+      callTypeModal.classList.remove('active');
+      startCall('video');
+    });
+    document.getElementById('cancelCallTypeBtn').addEventListener('click', () => {
+      callTypeModal.classList.remove('active');
+    });
+
+    async function startCall(callType) {
+      currentCallType = callType;
+      callActive = true;
+      callModal.classList.add('active');
+      const constraints = callType === 'video' ? { video: true, audio: true } : { video: false, audio: true };
+      try {
+        localStream = await navigator.mediaDevices.getUserMedia(constraints);
+        localVideo.srcObject = localStream;
+        if (callType === 'audio') localVideo.style.display = 'none';
+        else localVideo.style.display = '';
+        createPeerConnection();
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        set(ref(db, 'calls/current'), { type: 'offer', sdp: pc.localDescription, from: currentUser.username, callType });
+      } catch (e) {
+        alert('Kamera/mikrofon ruxsati kerak');
+        callModal.classList.remove('active');
+        callActive = false;
+      }
+    }
+
+    function createPeerConnection() {
+      pc = new RTCPeerConnection({
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          {
+            urls: 'turn:openrelay.metered.ca:443',
+            credential: 'openrelayproject',
+            username: 'openrelayproject'
+          }
+        ]
+      });
+      pc.onicecandidate = e => {
+        if (e.candidate) {
+          set(ref(db, 'calls/current'), { type: 'candidate', candidate: e.candidate, from: currentUser.username });
+        }
+      };
+      pc.ontrack = e => {
+        if (e.streams[0]) remoteVideo.srcObject = e.streams[0];
+      };
+      if (localStream) {
+        localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+      }
+    }
+
+    function showIncomingCall(data) {
+      if (callActive || incomingCallData) return;
+      incomingCallData = data;
+      document.getElementById('incomingCallTitle').textContent = `📞 ${partner.nickname} qo'ng'iroq qilmoqda`;
+      document.getElementById('incomingCallInfo').textContent = data.callType === 'audio' ? 'Audio qo\'ng\'iroq' : 'Video qo\'ng\'iroq';
+      incomingCallModal.classList.add('active');
+      incomingCallTimer = setTimeout(() => {
+        if (incomingCallData) {
+          set(ref(db, 'calls/current'), { type: 'reject', from: currentUser.username });
+          hideIncomingCall();
+          showNotification('Qo\'ng\'iroq vaqti tugadi', `${partner.nickname} qo\'ng\'irog\'i avtomatik rad etildi`);
+        }
+      }, 20000);
+      if (document.visibilityState === 'hidden' || !document.hasFocus()) {
+        showNotification('Kiruvchi qo\'ng\'iroq', `${partner.nickname} sizga qo\'ng\'iroq qilmoqda`);
+      }
+    }
+
+    function hideIncomingCall() {
+      incomingCallModal.classList.remove('active');
+      clearTimeout(incomingCallTimer);
+      incomingCallData = null;
+    }
+
+    document.getElementById('acceptCallBtn').addEventListener('click', async () => {
+      if (!incomingCallData) return;
+      const data = incomingCallData;
+      hideIncomingCall();
+      currentCallType = data.callType || 'video';
+      const constraints = currentCallType === 'video' ? { video: true, audio: true } : { video: false, audio: true };
+      try {
+        localStream = await navigator.mediaDevices.getUserMedia(constraints);
+        localVideo.srcObject = localStream;
+        if (currentCallType === 'audio') localVideo.style.display = 'none';
+        else localVideo.style.display = '';
+        createPeerConnection();
+        await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        set(ref(db, 'calls/current'), { type: 'answer', sdp: pc.localDescription, from: currentUser.username });
+        callModal.classList.add('active');
+        callActive = true;
+      } catch (e) {
+        alert('Media ruxsati kerak');
+        set(ref(db, 'calls/current'), { type: 'reject', from: currentUser.username });
+      }
+    });
+
+    document.getElementById('declineCallBtn').addEventListener('click', () => {
+      hideIncomingCall();
+      set(ref(db, 'calls/current'), { type: 'reject', from: currentUser.username });
+    });
 
     function endCall() {
-        if (pc) { pc.close(); pc = null; }
-        if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
-        $('#localVideo').srcObject = null; $('#remoteVideo').srcObject = null;
-        $('#videoCallModal').classList.remove('active');
-        $('#audioCallModal').classList.remove('active');
-        signalingRef.off('child_added', handleSignaling);
-        // Remove signaling data
-        signalingRef.remove();
-        callType = null;
+      if (pc) { pc.close(); pc = null; }
+      if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+      localVideo.srcObject = null;
+      remoteVideo.srcObject = null;
+      callModal.classList.remove('active');
+      callActive = false;
+      if (incomingCallData) hideIncomingCall();
+      set(ref(db, 'calls/current'), { type: 'hangup', from: currentUser.username });
+    }
+    document.getElementById('hangupBtn').addEventListener('click', endCall);
+
+    partnerPic.addEventListener('click', () => {
+      const pic = getProfilePic(partner.username);
+      if (pic) {
+        previewImg.src = pic;
+        imagePreview.style.display = 'flex';
+      }
+    });
+    imagePreview.addEventListener('click', () => { imagePreview.style.display = 'none'; });
+
+    function requestNotificationPermission() {
+      if (Notification.permission === 'default') Notification.requestPermission();
+    }
+    function showNotification(title, body) {
+      if (Notification.permission === 'granted') {
+        new Notification(title, { body, icon: '/favicon.ico' });
+      }
     }
 
-    $('#videoCallBtn').onclick = () => startCall('video');
-    $('#audioCallBtn').onclick = () => startCall('audio');
-    $('#endVideoCallBtn').onclick = endCall;
-    $('#endAudioCallBtn').onclick = endCall;
-    $('#videoMuteBtn').onclick = () => {
-        if (localStream) {
-            const enabled = !localStream.getAudioTracks()[0].enabled;
-            localStream.getAudioTracks()[0].enabled = enabled;
-            $('#videoMuteBtn').textContent = enabled ? '🎙️' : '🔇';
-        }
-    };
-    $('#audioMuteBtn').onclick = () => {
-        if (localStream) {
-            const enabled = !localStream.getAudioTracks()[0].enabled;
-            localStream.getAudioTracks()[0].enabled = enabled;
-            $('#audioMuteBtn').textContent = enabled ? '🎙️' : '🔇';
-        }
-    };
+    document.getElementById('settingsBtn').addEventListener('click', () => settingsModal.classList.add('active'));
+    document.getElementById('closeSettingsBtn').addEventListener('click', () => settingsModal.classList.remove('active'));
+    document.getElementById('savePicBtn').addEventListener('click', () => {
+      const file = picUpload.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => { setProfilePic(currentUser.username, e.target.result); updatePartnerProfile(); set(ref(db, `profiles/${currentUser.username}`), e.target.result); settingsModal.classList.remove('active'); };
+      reader.readAsDataURL(file);
+    });
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      endCall();
+      await sendPresence(false); chatActive = false; currentUser = null; partner = null; messages = []; replyTarget = null;
+      chatScreen.classList.remove('active'); document.body.style.backgroundImage = ''; loginScreen.style.display = 'flex';
+      step1.classList.add('active'); step2.classList.remove('active');
+      usernameInput.value = ''; passwordInput.value = ''; keywordInput.value = ''; settingsModal.classList.remove('active');
+      setBodyBackground('1.png');
+    });
 
-    // Cleanup on page unload
-    window.onbeforeunload = () => {
-        if (currentUser) updateMyPresence(false);
-    };
-</script>
+    document.getElementById('nextBtn').addEventListener('click', () => {
+      const u = usernameInput.value.trim(); const p = passwordInput.value;
+      const user = USERS[u]; if (user && user.password === p) { currentUser = user; loginError.textContent = ''; step1.classList.remove('active'); step2.classList.add('active'); keywordInput.focus(); setBodyBackground('2.png'); }
+      else loginError.textContent = 'Noto\'g\'ri login yoki parol';
+    });
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+      if (keywordInput.value.trim() === KEYWORD) { keywordError.textContent = ''; startChat(); }
+      else keywordError.textContent = 'Kalit so\'z xato';
+    });
+
+    async function startChat() {
+      partner = currentUser.username === 'user_1' ? USERS.user_2 : USERS.user_1;
+      partnerNameEl.textContent = partner.nickname; updatePartnerProfile();
+      loginScreen.style.display = 'none'; chatScreen.classList.add('active'); chatActive = true;
+      applyTheme(); updateBodyBackground(); setupPresenceSystem(); startListeners();
+      requestNotificationPermission();
+      const myPic = getProfilePic(currentUser.username); if (myPic) set(ref(db, `profiles/${currentUser.username}`), myPic);
+      window.addEventListener('beforeunload', () => { if (currentUser) sendPresence(false); });
+    }
+
+    setBodyBackground('1.png');
+    applyTheme();
+  </script>
 </body>
 </html>
