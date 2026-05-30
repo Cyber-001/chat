@@ -62,7 +62,6 @@ input,textarea,select,button{font-family:var(--f)}
 .bk b{color:var(--acc2)}
 .chat-pg{position:fixed;inset:0;z-index:2;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .3s}
 .chat-pg.act{opacity:1;pointer-events:all}
-/* FIX 2: Hide header when call overlay is active */
 .chat-pg.call-active .hdr{visibility:hidden;pointer-events:none}
 .hdr{background:var(--bg2);border-bottom:1px solid var(--bdr);padding:8px 13px;display:flex;align-items:center;gap:11px;flex-shrink:0;backdrop-filter:blur(20px);z-index:10;box-shadow:0 2px 16px rgba(0,0,0,.22);transition:visibility .2s}
 .hav{width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid var(--acc);cursor:pointer;flex-shrink:0;transition:transform .2s}
@@ -244,18 +243,29 @@ input,textarea,select,button{font-family:var(--f)}
 .pl-empty{text-align:center;padding:24px;color:var(--tx3);font-size:12.5px;background:var(--bg2);border-radius:13px;border:1px solid var(--bdr)}
 
 /* ══ CALL OVERLAY ══ */
-/* FIX 3: Smoother transitions for call overlay */
 .call-ov{
   position:fixed;inset:0;background:rgba(8,8,15,.97);z-index:400;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:14px;backdrop-filter:blur(24px);padding-bottom:env(safe-area-inset-bottom);
   opacity:0;pointer-events:none;
-  transition:opacity .35s cubic-bezier(.4,0,.2,1);
+  transition:opacity .4s cubic-bezier(.4,0,.2,1);
   will-change:opacity;
 }
 .call-ov.show{opacity:1;pointer-events:all}
-.c-inc{display:flex;flex-direction:column;align-items:center;gap:13px;
-  transition:opacity .25s ease,transform .25s ease;will-change:opacity,transform}
+
+/* c-inc: incoming/outgoing ring screen */
+.c-inc{
+  display:flex;flex-direction:column;align-items:center;gap:13px;
+  transition:opacity .3s ease, transform .3s ease;
+  will-change:opacity,transform;
+}
+/* fade-out state before switching to active call */
+.c-inc.fade-out{
+  opacity:0;
+  transform:scale(.92) translateY(-12px);
+  pointer-events:none;
+}
+
 .c-rings{position:relative;display:flex;align-items:center;justify-content:center;margin-bottom:4px}
 .cring{position:absolute;width:108px;height:108px;border-radius:50%;border:2px solid rgba(108,99,255,.3);animation:cring 2s ease-out infinite}
 .cring:nth-child(2){animation-delay:.5s}.cring:nth-child(3){animation-delay:1s}
@@ -267,17 +277,29 @@ input,textarea,select,button{font-family:var(--f)}
 .c-inc-btns{display:flex;gap:28px;margin-top:10px}
 .cbig{width:68px;height:68px;border-radius:50%;border:none;cursor:pointer;font-size:26px;display:flex;align-items:center;justify-content:center;transition:all .22s;position:relative}
 .cbig:hover{transform:scale(1.1)}
-.cbig.acc{background:var(--grn);box-shadow:0 4px 22px rgba(45,212,160,.45)}
-/* FIX 1: Accept button ring animation to show it's tappable */
-.cbig.acc{animation:accPulse 1.8s ease infinite}
+.cbig.acc{background:var(--grn);box-shadow:0 4px 22px rgba(45,212,160,.45);animation:accPulse 1.8s ease infinite}
 @keyframes accPulse{0%,100%{box-shadow:0 4px 22px rgba(45,212,160,.45)}50%{box-shadow:0 4px 30px rgba(45,212,160,.75),0 0 0 8px rgba(45,212,160,.15)}}
 .cbig.dec{background:var(--red);box-shadow:0 4px 22px rgba(255,95,122,.45)}
 .cbig-lbl{position:absolute;bottom:-20px;font-size:10.5px;font-weight:700;color:var(--tx2);white-space:nowrap;left:50%;transform:translateX(-50%)}
-/* FIX 3: Smoother active call panel */
-.c-act{display:none;flex-direction:column;align-items:center;gap:13px;width:100%;
-  animation:fadeSlideUp .3s cubic-bezier(.34,1.2,.64,1) both}
-@keyframes fadeSlideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-.c-act.show{display:flex}
+
+/* c-act: active call screen — always in DOM, shown via opacity+transform */
+.c-act{
+  display:flex;flex-direction:column;align-items:center;gap:13px;width:100%;
+  opacity:0;
+  transform:translateY(20px) scale(.96);
+  pointer-events:none;
+  transition:opacity .35s cubic-bezier(.34,1.2,.64,1), transform .35s cubic-bezier(.34,1.2,.64,1);
+  will-change:opacity,transform;
+  /* hidden by default but always in layout flow — avoids display:none flash */
+  position:absolute;
+}
+.c-act.show{
+  opacity:1;
+  transform:none;
+  pointer-events:all;
+  position:relative;
+}
+
 .c-act .cav{width:86px;height:86px}
 .ctm{font-family:var(--mono);font-size:28px;font-weight:700;color:var(--acc2);letter-spacing:3px;
   text-shadow:0 0 20px rgba(108,99,255,.4)}
@@ -300,14 +322,28 @@ input,textarea,select,button{font-family:var(--f)}
 .imgv-cl{position:absolute;top:14px;right:14px;background:rgba(0,0,0,.4);border:none;color:#fff;width:40px;height:40px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--bg2);border:1px solid var(--bdr2);border-radius:11px;padding:8px 18px;font-size:12.5px;font-weight:600;z-index:600;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.4);backdrop-filter:blur(12px);white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.dbg{position:fixed;top:60px;right:8px;background:rgba(0,0,0,.8);color:#0f0;font-family:monospace;font-size:10px;padding:6px 10px;border-radius:8px;z-index:999;max-width:200px;display:none;line-height:1.5;pointer-events:none}
-.dbg.show{display:block}
+
+/* ── DEBUG PANEL: opacity-based hide, auto-fades ── */
+.dbg{
+  position:fixed;top:60px;right:8px;
+  background:rgba(0,0,0,.85);color:#0f0;
+  font-family:monospace;font-size:10px;
+  padding:6px 10px;border-radius:8px;z-index:999;
+  max-width:220px;line-height:1.6;pointer-events:none;
+  opacity:0;
+  transform:translateX(8px);
+  transition:opacity .3s ease, transform .3s ease;
+  /* always in DOM — no display toggle needed */
+}
+.dbg.show{opacity:1;transform:none}
+
 @media(max-width:600px){.acard{padding:24px 16px}.mbbl{max-width:85%}.mbox{padding:18px 14px}.pvbody{padding:54px 16px 20px}.sp-body{padding:10px}.vsl{width:85px}}
 @media(max-width:360px){.sgrid{grid-template-columns:repeat(4,1fr)}}
 </style>
 </head>
 <body>
 <div class="bgl" id="bgl"></div>
+<!-- debug panel: always present, hidden via opacity -->
 <div class="dbg" id="dbg"></div>
 
 <!-- LOADER -->
@@ -568,6 +604,7 @@ input,textarea,select,button{font-family:var(--f)}
 
 <!-- ══ CALL OVERLAY ══ -->
 <div class="call-ov" id="call-ov">
+  <!-- incoming / outgoing ring screen -->
   <div class="c-inc" id="c-inc">
     <div class="c-rings">
       <div class="cring"></div><div class="cring"></div><div class="cring"></div>
@@ -592,6 +629,7 @@ input,textarea,select,button{font-family:var(--f)}
     </div>
   </div>
 
+  <!-- active call screen — always in DOM, shown via CSS transition -->
   <div class="c-act" id="c-act">
     <img class="cav" id="cav-act" src="" alt="">
     <div class="cnm" id="cnm-act"></div>
@@ -665,7 +703,6 @@ let unsMsg=null,unsTyp=null,unsOnl=null,unsPrf=null,unsWC=null;
 let pc=null,localStream=null,currentCallId=null;
 let pendingCandidates=[];
 
-// FIX 3: Enhanced ICE config with more STUN servers for better connectivity
 const ICE_CFG={
  iceServers:[
   {urls:'stun:stun.l.google.com:19302'},
@@ -684,14 +721,21 @@ const ICE_CFG={
 function getCallId(a,b){return[a,b].sort().join('_');}
 function callRef(...p){return R('webrtc','calls',currentCallId,...p);}
 
+/* ── Debug: auto-hide after 5s ── */
+let _dbgTimer=null;
 function dbg(msg){
  const el=$('dbg');if(!el)return;
- el.classList.add('show');
- el.innerHTML=(el.innerHTML+'\n'+msg).split('\n').slice(-8).join('\n');
  console.log('[WebRTC]',msg);
+ el.innerHTML=(el.innerHTML+'\n'+msg).split('\n').slice(-8).join('\n');
+ el.classList.add('show');
+ clearTimeout(_dbgTimer);
+ _dbgTimer=setTimeout(()=>{
+  el.classList.remove('show');
+  // clear text after fade-out completes
+  setTimeout(()=>{if(!el.classList.contains('show'))el.innerHTML='';},350);
+ },5000);
 }
 
-// FIX 2: Helper to toggle header visibility during calls
 function setCallActive(active){
  const chatPg=$('pg-chat');
  if(chatPg){
@@ -718,7 +762,6 @@ async function createPC(){
    dbg('✅ P2P ulandi!');
    if(callState==='active'){$('c-st').textContent=isVid?"Video qo'ng'iroq":"Audio qo'ng'iroq";}
   }
-  // FIX 3: ICE restart on failure
   if(pc&&pc.iceConnectionState==='failed'){
    dbg('ICE failed — restart...');
    pc.restartIce();
@@ -780,7 +823,6 @@ async function initiateCall(){
  dbg('Chiquvchi: '+currentCallId+' vid='+isVid);
 
  try{
-  // FIX 3: Higher quality media constraints
   const c=isVid
    ?{video:{width:{ideal:1280},height:{ideal:720},facingMode:'user',frameRate:{ideal:30}},audio:{echoCancellation:true,noiseSuppression:true,sampleRate:48000}}
    :{audio:{echoCancellation:true,noiseSuppression:true,sampleRate:48000},video:false};
@@ -816,7 +858,6 @@ async function initiateCall(){
 
  callState='ringing_out';
  showRingUI(true,them,isVid);
- // FIX 1: Ensure ringtone starts cleanly
  auRng.currentTime=0;
  auRng.play().catch(()=>{});
 }
@@ -838,7 +879,6 @@ function subWebRTC(){
     callState='ringing_in';
     window._incomingData=v;
     showRingUI(false,v.caller||them,isVid);
-    // FIX 1: Ensure ringtone starts cleanly
     auRng.currentTime=0;
     auRng.play().catch(()=>{});
    }
@@ -869,7 +909,20 @@ function subWebRTC(){
  });
 }
 
+/* ── showRingUI: prepare ring/incoming screen cleanly ── */
 function showRingUI(isOutgoing,fromUid,video){
+ // Reset c-act to hidden state without transition (instant)
+ const act=$('c-act');
+ act.style.transition='none';
+ act.classList.remove('show');
+ void act.offsetWidth; // force reflow so transition disabling takes effect
+ act.style.transition='';
+
+ // Reset c-inc to visible, no fade-out
+ const inc=$('c-inc');
+ inc.classList.remove('fade-out');
+ inc.style.display='flex';
+
  $('cav-inc').src=getAv(fromUid);
  $('cnm-inc').textContent=getName(fromUid);
  $('ctype-lbl').textContent=video?"VIDEO QO'NG'IROQ":"AUDIO QO'NG'IROQ";
@@ -877,16 +930,13 @@ function showRingUI(isOutgoing,fromUid,video){
  $('c-inc-btns').style.display=isOutgoing?'none':'flex';
  $('c-out-btns').style.display=isOutgoing?'flex':'none';
  $('acc-btn').textContent=video?'📹':'📞';
- $('c-inc').style.display='flex';
- $('c-act').classList.remove('show');
- // FIX 2: Hide header when call overlay is shown
+
  $('call-ov').classList.add('show');
  setCallActive(true);
 }
 
 /* ══ Qabul qilish ══ */
 window.acceptCall=async()=>{
- // FIX 1: Stop ringtone IMMEDIATELY before any async work
  auRng.pause();
  auRng.currentTime=0;
 
@@ -895,7 +945,6 @@ window.acceptCall=async()=>{
  dbg('Qabul qilinmoqda...');
 
  try{
-  // FIX 3: Higher quality media constraints
   const c=isVid
    ?{video:{width:{ideal:1280},height:{ideal:720},facingMode:'user',frameRate:{ideal:30}},audio:{echoCancellation:true,noiseSuppression:true,sampleRate:48000}}
    :{audio:{echoCancellation:true,noiseSuppression:true,sampleRate:48000},video:false};
@@ -932,7 +981,6 @@ window.acceptCall=async()=>{
 };
 
 window.declineCall=async()=>{
- // FIX 1: Stop ringtone on decline
  auRng.pause();
  auRng.currentTime=0;
  if(currentCallId)await update(callRef(),{state:'ended'}).catch(()=>{});
@@ -943,7 +991,6 @@ window.declineCall=async()=>{
 };
 
 window.cancelOutgoing=async()=>{
- // FIX 1: Stop ringtone on cancel
  auRng.pause();
  auRng.currentTime=0;
  dbg('Chiquvchi bekor qilindi');
@@ -952,13 +999,12 @@ window.cancelOutgoing=async()=>{
  setTimeout(()=>{if(currentCallId)remove(callRef()).catch(()=>{});currentCallId=null;},2000);
 };
 
+/* ── activateCallUI: smooth fade ring-screen → active-screen ── */
 function activateCallUI(){
- // FIX 1: Absolutely ensure ringtone is stopped when call becomes active
  auRng.pause();
  auRng.currentTime=0;
 
- $('c-inc').style.display='none';
- $('c-act').classList.add('show');
+ // Prepare active panel content before animating in
  $('cav-act').src=getAv(them);
  $('cnm-act').textContent=getName(them);
  $('c-st').textContent=isVid?"Video qo'ng'iroq":"Audio qo'ng'iroq";
@@ -969,6 +1015,17 @@ function activateCallUI(){
  isMuted=false;isCamOff=false;isSpkOff=false;
  $('cb-mut').classList.remove('act');$('cb-cam').classList.remove('act');$('cb-spk').classList.remove('act');
  $('cb-mut').textContent='🎤';$('cb-cam').textContent='📷';$('cb-spk').textContent='🔊';
+
+ // Step 1: fade out ring screen
+ const inc=$('c-inc');
+ inc.classList.add('fade-out');
+
+ // Step 2: after fade-out completes, hide ring screen and reveal active panel
+ setTimeout(()=>{
+  inc.style.display='none';
+  $('c-act').classList.add('show');
+ },300); // matches .c-inc transition duration
+
  dbg('✅ Qo\'ng\'iroq faollashdi');
 }
 
@@ -983,7 +1040,6 @@ window.endCall=async()=>{
 
 function endCallLocal(cleanupNode){
  clearInterval(callTim);
- // FIX 1: Always stop ringtone in endCallLocal
  auRng.pause();
  auRng.currentTime=0;
  if(unsICE){unsICE();unsICE=null;}
@@ -992,13 +1048,28 @@ function endCallLocal(cleanupNode){
  if(rv?.srcObject){try{rv.srcObject.getTracks().forEach(t=>t.stop());}catch(e){}rv.srcObject=null;}
  if(lv?.srcObject)lv.srcObject=null;
  if(pc){try{pc.close();}catch(e){}pc=null;}
+
+ // Fade out overlay
  $('call-ov').classList.remove('show');
- // FIX 2: Restore header visibility
  setCallActive(false);
- $('c-inc').style.display='flex';
- $('c-act').classList.remove('show');
- $('c-inc-btns').style.display='none';
- $('c-out-btns').style.display='none';
+
+ // Reset both panels cleanly after overlay fades (400ms)
+ setTimeout(()=>{
+  const inc=$('c-inc');
+  inc.classList.remove('fade-out');
+  inc.style.display='flex';
+
+  // Reset c-act instantly (no transition while hidden)
+  const act=$('c-act');
+  act.style.transition='none';
+  act.classList.remove('show');
+  void act.offsetWidth;
+  act.style.transition='';
+
+  $('c-inc-btns').style.display='none';
+  $('c-out-btns').style.display='none';
+ },450);
+
  callState='idle';
  window._incomingData=null;
  pendingCandidates=[];
