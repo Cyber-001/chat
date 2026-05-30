@@ -30,21 +30,15 @@ input,textarea,select,button{font-family:var(--f)}
 ::selection{background:rgba(108,99,255,.28)}
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px}
-
 .bgl{position:fixed;inset:0;z-index:0;background-size:cover;background-position:center;filter:blur(18px) brightness(.45) saturate(1.2);transform:scale(1.08);transition:background-image .6s;pointer-events:none}
 .light .bgl{filter:blur(18px) brightness(.82) saturate(1.1)}
-
 .pg{position:fixed;inset:0;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;transform:translateY(12px);z-index:1}
 .pg.act{opacity:1;pointer-events:all;transform:none;z-index:2}
-
-/* LOADER */
 .ldr{background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;z-index:99}
 .ldr-ico{width:68px;height:68px;background:var(--me);border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 4px 28px rgba(108,99,255,.45);animation:pop .6s cubic-bezier(.34,1.56,.64,1)}
 @keyframes pop{0%{transform:scale(.3);opacity:0}100%{transform:scale(1);opacity:1}}
 .spin{width:34px;height:34px;border:3px solid var(--bdr2);border-top-color:var(--acc);border-radius:50%;animation:sp .8s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
-
-/* AUTH */
 .awrap{display:flex;align-items:center;justify-content:center;height:100%;position:relative;z-index:1;padding:16px}
 .acard{background:var(--bg2);border:1px solid var(--bdr);border-radius:26px;padding:36px 28px;width:min(420px,100%);box-shadow:var(--shd);backdrop-filter:blur(20px)}
 .a-logo{text-align:center;margin-bottom:28px}
@@ -66,8 +60,6 @@ input,textarea,select,button{font-family:var(--f)}
 .err{color:var(--red);font-size:12px;text-align:center;margin-top:8px;min-height:16px;font-weight:500}
 .bk{text-align:center;margin-top:14px;font-size:13px;color:var(--tx3);cursor:pointer}
 .bk b{color:var(--acc2)}
-
-/* CHAT */
 .chat-pg{position:fixed;inset:0;z-index:2;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .3s}
 .chat-pg.act{opacity:1;pointer-events:all}
 .hdr{background:var(--bg2);border-bottom:1px solid var(--bdr);padding:8px 13px;display:flex;align-items:center;gap:11px;flex-shrink:0;backdrop-filter:blur(20px);z-index:10;box-shadow:0 2px 16px rgba(0,0,0,.22)}
@@ -82,7 +74,6 @@ input,textarea,select,button{font-family:var(--f)}
 .hacts{display:flex;gap:4px}
 .ib{width:38px;height:38px;border-radius:50%;border:none;background:var(--bg3);color:var(--tx2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;transition:all .2s;flex-shrink:0;backdrop-filter:blur(8px)}
 .ib:hover{background:var(--bg4);color:var(--tx)}
-
 .msgs{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px 10px 4px;display:flex;flex-direction:column;gap:2px;-webkit-overflow-scrolling:touch}
 .ddiv{text-align:center;margin:10px 0 4px}
 .ddiv span{background:var(--bg3);color:var(--tx3);font-size:10.5px;padding:3px 12px;border-radius:20px;font-weight:600;backdrop-filter:blur(8px)}
@@ -111,14 +102,12 @@ input,textarea,select,button{font-family:var(--f)}
 .mimg{max-width:210px;max-height:230px;border-radius:11px;cursor:pointer;display:block;object-fit:cover}
 .mvid{max-width:min(210px,70vw);border-radius:11px;display:block}
 .maud{width:min(200px,65vw);height:36px}
-
 .typa{min-height:26px;padding:2px 14px;display:flex;align-items:center;flex-shrink:0}
 .tbbl{display:inline-flex;align-items:center;gap:7px;background:var(--other);border-radius:17px;border-bottom-left-radius:4px;padding:7px 13px;backdrop-filter:blur(12px)}
 .tdots{display:inline-flex;gap:3px;align-items:center}
 .td{width:5px;height:5px;border-radius:50%;background:var(--acc2);animation:bn 1.2s infinite}
 .td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
 @keyframes bn{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
-
 .rbar{background:var(--bg3);border-top:1px solid var(--bdr);padding:7px 13px;display:none;align-items:center;gap:10px;flex-shrink:0;backdrop-filter:blur(12px)}
 .rbar.show{display:flex}
 .rbar-s{width:3px;background:var(--acc);border-radius:2px;align-self:stretch;flex-shrink:0}
@@ -126,7 +115,6 @@ input,textarea,select,button{font-family:var(--f)}
 .rbar-nm{font-size:11px;font-weight:700;color:var(--acc2);margin-bottom:2px}
 .rbar-tx{font-size:11.5px;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rbar-cl{cursor:pointer;color:var(--tx3);font-size:20px;line-height:1;flex-shrink:0}
-
 .cinp{background:var(--bg2);border-top:1px solid var(--bdr);padding:8px 11px;padding-bottom:max(8px,env(safe-area-inset-bottom));display:flex;align-items:flex-end;gap:7px;flex-shrink:0;backdrop-filter:blur(20px)}
 .iic{color:var(--tx3);cursor:pointer;font-size:22px;padding:7px 3px;transition:color .2s;flex-shrink:0;line-height:1;user-select:none}
 .iic:hover{color:var(--acc2)}
@@ -139,28 +127,20 @@ input,textarea,select,button{font-family:var(--f)}
 .recb{width:40px;height:40px;border-radius:50%;background:var(--bg3);border:1.5px solid var(--bdr2);color:var(--tx2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .2s;flex-shrink:0}
 .recb.rec{background:var(--red);color:#fff;border-color:transparent;animation:recP 1s infinite}
 @keyframes recP{0%,100%{box-shadow:0 0 0 0 rgba(255,95,122,.35)}50%{box-shadow:0 0 0 9px rgba(255,95,122,0)}}
-
-/* STICKER PICKER */
 .spick{position:fixed;bottom:72px;left:8px;width:min(300px,calc(100vw - 16px));max-height:240px;background:var(--bg2);border:1px solid var(--bdr2);border-radius:18px;padding:10px;z-index:60;display:none;box-shadow:0 -4px 30px rgba(0,0,0,.4);backdrop-filter:blur(20px);animation:popUp .18s ease;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .spick.show{display:block}
 @keyframes popUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .sgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:3px}
 .si{font-size:24px;cursor:pointer;text-align:center;padding:6px 4px;border-radius:10px;transition:transform .12s,background .12s;user-select:none;line-height:1.3}
 .si:hover,.si:active{transform:scale(1.25);background:var(--bg4)}
-
-/* ATTACH MENU */
 .amenu{position:fixed;background:var(--bg2);border:1px solid var(--bdr2);border-radius:16px;padding:6px;z-index:60;display:none;box-shadow:var(--shd);min-width:160px;backdrop-filter:blur(20px);animation:pop .15s ease}
 .amenu.show{display:block}
 .ait{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:13px;transition:background .15s}
 .ait:hover,.ait:active{background:var(--bg4)}
-
-/* CONTEXT MENU */
 .ctx{position:fixed;background:var(--bg2);border:1px solid var(--bdr2);border-radius:15px;padding:5px;z-index:200;box-shadow:0 12px 48px rgba(0,0,0,.5);min-width:162px;display:none;animation:pop .14s ease;backdrop-filter:blur(20px)}
 .ci{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;cursor:pointer;font-size:13px;transition:background .15s}
 .ci:hover,.ci:active{background:var(--bg4)}
 .ci.red{color:var(--red)}
-
-/* MODALS */
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:300;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);padding:16px}
 .ov.show{display:flex}
 .mbox{background:var(--bg2);border:1px solid var(--bdr2);border-radius:22px;padding:22px 20px;width:min(420px,100%);box-shadow:var(--shd);animation:pop .2s ease;max-height:88vh;overflow-y:auto;backdrop-filter:blur(20px)}
@@ -173,8 +153,6 @@ input,textarea,select,button{font-family:var(--f)}
 .ma{display:flex;gap:9px;margin-top:14px}
 .bs{flex:1;background:var(--bg4);border:none;border-radius:11px;padding:11px;color:var(--tx);font-size:13.5px;cursor:pointer;font-weight:600;transition:background .2s}
 .bs:hover{background:var(--bg5)}
-
-/* PROFILE OVERLAY */
 .prof-ov{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:310;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(8px)}
 .prof-ov.show{display:flex}
 .pcard{background:var(--bg2);border:1px solid var(--bdr2);border-radius:24px 24px 0 0;width:min(500px,100vw);max-height:92vh;overflow-y:auto;animation:su .28s cubic-bezier(.34,1.2,.64,1);backdrop-filter:blur(24px);-webkit-overflow-scrolling:touch}
@@ -198,8 +176,6 @@ input,textarea,select,button{font-family:var(--f)}
 .pvfic{width:34px;height:34px;border-radius:9px;background:rgba(108,99,255,.12);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
 .pvflbl{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--tx3);margin-bottom:2px}
 .pvfval{font-size:13.5px;font-weight:600}
-
-/* SETTINGS — 3 tabs */
 .sp{background:transparent;display:flex;flex-direction:column;height:100%}
 .sp-hdr{background:var(--bg2);border-bottom:1px solid var(--bdr);padding:11px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0;backdrop-filter:blur(20px)}
 .sp-hdr h2{font-size:17px;font-weight:800}
@@ -207,8 +183,6 @@ input,textarea,select,button{font-family:var(--f)}
 .sptab{flex:1;padding:9px 6px;border-radius:13px;border:1.5px solid var(--bdr2);background:var(--bg2);color:var(--tx2);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;text-align:center;backdrop-filter:blur(8px)}
 .sptab.on{background:var(--me);color:#fff;border-color:transparent;box-shadow:0 3px 12px rgba(108,99,255,.4)}
 .sp-body{flex:1;overflow-y:auto;padding:13px;-webkit-overflow-scrolling:touch}
-
-/* Profile settings */
 .pav-w{display:flex;flex-direction:column;align-items:center;margin-bottom:20px;gap:10px}
 .pav{width:84px;height:84px;border-radius:50%;object-fit:cover;border:3px solid var(--acc);box-shadow:0 0 0 6px rgba(108,99,255,.1)}
 .av-grid{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
@@ -218,8 +192,6 @@ input,textarea,select,button{font-family:var(--f)}
 .uplbl:hover{background:var(--bg4);color:var(--tx)}
 .sp-fg{margin-bottom:13px}
 .sp-fl{display:block;font-size:10.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--tx3);margin-bottom:5px}
-
-/* General settings */
 .s-sec{margin-bottom:18px}
 .s-sec-t{font-size:10px;font-weight:800;letter-spacing:1.1px;text-transform:uppercase;color:var(--tx3);margin-bottom:8px;padding-left:2px}
 .srow{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg2);border-radius:13px;margin-bottom:6px;border:1px solid var(--bdr);backdrop-filter:blur(8px);transition:background .15s}
@@ -238,8 +210,6 @@ input,textarea,select,button{font-family:var(--f)}
 .vsl{-webkit-appearance:none;appearance:none;width:100px;height:5px;border-radius:3px;background:var(--bdr2);outline:none;cursor:pointer}
 .vsl::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:var(--acc);cursor:pointer}
 .lang-sel{background:var(--bg4);border:1.5px solid var(--bdr2);border-radius:9px;padding:5px 10px;color:var(--tx);font-size:12.5px;outline:none;cursor:pointer}
-
-/* PLAYLIST TAB */
 .pl-now{background:var(--bg2);border-radius:13px;padding:13px 14px;margin-bottom:10px;border:1px solid var(--bdr);display:flex;align-items:center;gap:12px}
 .pl-now-av{width:44px;height:44px;border-radius:10px;background:rgba(108,99,255,.18);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
 .pl-now-info{flex:1;min-width:0}
@@ -270,8 +240,7 @@ input,textarea,select,button{font-family:var(--f)}
 .pl-del{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:15px;padding:4px 6px;border-radius:6px;transition:color .15s;flex-shrink:0}
 .pl-del:hover{color:var(--red)}
 .pl-empty{text-align:center;padding:24px;color:var(--tx3);font-size:12.5px;background:var(--bg2);border-radius:13px;border:1px solid var(--bdr)}
-
-/* CALL OVERLAY */
+/* ══ CALL OVERLAY ══ */
 .call-ov{position:fixed;inset:0;background:rgba(8,8,15,.95);z-index:400;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;backdrop-filter:blur(16px);padding-bottom:env(safe-area-inset-bottom)}
 .call-ov.show{display:flex}
 .c-inc{display:flex;flex-direction:column;align-items:center;gap:13px;animation:pop .3s ease}
@@ -294,7 +263,6 @@ input,textarea,select,button{font-family:var(--f)}
 .c-act .cav{width:86px;height:86px}
 .ctm{font-family:var(--mono);font-size:24px;color:var(--acc2);letter-spacing:2px}
 .cst{color:var(--tx3);font-size:13px;font-weight:500}
-/* VIDEO AREA */
 .vid-area{display:none;position:relative;border-radius:18px;overflow:hidden;width:min(360px,90vw);background:#000;margin-top:6px}
 .vid-area.show{display:block}
 .vid-remote{width:100%;height:min(240px,50vw);object-fit:cover;display:block;background:#111}
@@ -306,21 +274,22 @@ input,textarea,select,button{font-family:var(--f)}
 .cbtn.end{background:var(--red);color:#fff;box-shadow:0 4px 16px rgba(255,95,122,.4)}
 .cbtn.side{background:var(--bg3);color:var(--tx2);border:1.5px solid var(--bdr2)}
 .cbtn.act{background:var(--acc);color:#fff;border-color:transparent}
-
 .imgv{position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:500;display:none;align-items:center;justify-content:center}
 .imgv.show{display:flex}
 .imgv img{max-width:94vw;max-height:94vh;border-radius:12px;box-shadow:0 8px 60px rgba(0,0,0,.7)}
 .imgv-cl{position:absolute;top:14px;right:14px;background:rgba(0,0,0,.4);border:none;color:#fff;width:40px;height:40px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
-
 .toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--bg2);border:1px solid var(--bdr2);border-radius:11px;padding:8px 18px;font-size:12.5px;font-weight:600;z-index:600;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.4);backdrop-filter:blur(12px);white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
+/* Debug panel */
+.dbg{position:fixed;top:60px;right:8px;background:rgba(0,0,0,.8);color:#0f0;font-family:monospace;font-size:10px;padding:6px 10px;border-radius:8px;z-index:999;max-width:200px;display:none;line-height:1.5;pointer-events:none}
+.dbg.show{display:block}
 @media(max-width:600px){.acard{padding:24px 16px}.mbbl{max-width:85%}.mbox{padding:18px 14px}.pvbody{padding:54px 16px 20px}.sp-body{padding:10px}.vsl{width:85px}}
 @media(max-width:360px){.sgrid{grid-template-columns:repeat(4,1fr)}}
 </style>
 </head>
 <body>
 <div class="bgl" id="bgl"></div>
+<div class="dbg" id="dbg"></div>
 
 <!-- LOADER -->
 <div class="pg ldr act" id="pg-ldr">
@@ -404,7 +373,7 @@ input,textarea,select,button{font-family:var(--f)}
   </div>
 </div>
 
-<!-- SETTINGS — 3 tabs -->
+<!-- SETTINGS -->
 <div class="pg" id="pg-sett">
   <div class="sp">
     <div class="sp-hdr">
@@ -417,8 +386,6 @@ input,textarea,select,button{font-family:var(--f)}
       <button class="sptab" id="tab-pl" onclick="swTab('pl')">🎵 Pleylist</button>
     </div>
     <div class="sp-body">
-
-      <!-- PROFIL TAB -->
       <div id="body-pr">
         <div class="pav-w">
           <img class="pav" id="my-av" src="" alt="">
@@ -434,8 +401,6 @@ input,textarea,select,button{font-family:var(--f)}
         <div class="sp-fg"><label class="sp-fl">Tug'ilgan sana</label><input class="mi" id="sp-dob" type="date"></div>
         <button class="bp" style="margin-top:4px" onclick="saveProf()">💾 Saqlash</button>
       </div>
-
-      <!-- UMUMIY TAB -->
       <div id="body-gn" style="display:none">
         <div class="s-sec">
           <div class="s-sec-t">Interfeys</div>
@@ -455,7 +420,7 @@ input,textarea,select,button{font-family:var(--f)}
         <div class="s-sec">
           <div class="s-sec-t">🔔 Bildirishnoma</div>
           <div class="srow">
-            <div class="srow-l"><span class="sic">🔔</span><div><div class="slbl">Bildirishnoma ovozi</div><div class="ssub">Yangi xabar kelganda</div></div></div>
+            <div class="srow-l"><span class="sic">🔔</span><div><div class="slbl">Bildirishnoma ovozi</div></div></div>
             <label class="tog"><input type="checkbox" id="tog-ntf" onchange="togNotif(this)" checked><span class="tog-sl"></span></label>
           </div>
           <div class="srow">
@@ -480,12 +445,9 @@ input,textarea,select,button{font-family:var(--f)}
             <span style="color:var(--tx3)">›</span>
           </div>
         </div>
-        <div style="text-align:center;margin-top:14px;color:var(--tx3);font-size:11.5px;font-family:var(--mono)">PrivateChat v5.0 · Only2</div>
+        <div style="text-align:center;margin-top:14px;color:var(--tx3);font-size:11.5px;font-family:var(--mono)">PrivateChat v5.1 · Only2</div>
       </div>
-
-      <!-- PLEYLIST TAB -->
       <div id="body-pl" style="display:none">
-        <!-- Now playing -->
         <div class="pl-now">
           <div class="pl-now-av" id="pl-now-ico">🎵</div>
           <div class="pl-now-info">
@@ -497,41 +459,33 @@ input,textarea,select,button{font-family:var(--f)}
             <div class="pl-now-name" id="pl-now-name">—</div>
           </div>
         </div>
-        <!-- Controls -->
         <div class="pl-ctrl">
-          <button class="pl-cb" onclick="prevTrack()" title="Oldingi">⏮</button>
-          <button class="pl-cb" id="pl-pp-btn" onclick="playPause()" title="Play/Pause">▶</button>
-          <button class="pl-cb" onclick="nextTrack()" title="Keyingi">⏭</button>
+          <button class="pl-cb" onclick="prevTrack()">⏮</button>
+          <button class="pl-cb" id="pl-pp-btn" onclick="playPause()">▶</button>
+          <button class="pl-cb" onclick="nextTrack()">⏭</button>
           <div class="pl-vsl-w">
             <div class="pl-vsl-l">Balandligi: <span id="mvol-lbl">40%</span></div>
             <input type="range" class="vsl" style="width:100%" id="vol-mus" min="0" max="100" value="40" oninput="setMusVol(this.value)">
           </div>
         </div>
-        <!-- Music on/off -->
         <div class="srow" style="margin-bottom:10px">
           <div class="srow-l"><span class="sic">🎵</span><div><div class="slbl">Fon musiqasi</div><div class="ssub" id="mus-sub">Yoqilgan</div></div></div>
           <label class="tog"><input type="checkbox" id="tog-mus" onchange="togMusic(this)" checked><span class="tog-sl"></span></label>
         </div>
-        <!-- Play mode -->
         <div class="pl-mode-row">
           <button class="pl-mode-btn on" id="pm-rep" onclick="setPlMode('repeat')">🔂 Takror</button>
           <button class="pl-mode-btn" id="pm-que" onclick="setPlMode('queue')">▶️ Navbat</button>
           <button class="pl-mode-btn" id="pm-shuf" onclick="setPlMode('shuffle')">🔀 Aralash</button>
         </div>
-        <!-- Add tracks -->
         <div class="pl-add-row">
           <label class="pl-add-btn">
-            ➕ Musiqa qo'shish (bir yoki bir nechta)
+            ➕ Musiqa qo'shish
             <input type="file" accept="audio/*" multiple style="display:none" onchange="addTracks(event)">
           </label>
         </div>
-        <!-- Track list -->
         <div class="pl-list" id="pl-list"></div>
-        <div class="pl-empty" id="pl-empty" style="display:none">
-          Pleylist bo'sh.<br><span style="color:var(--tx4);font-size:11.5px">Musiqa qo'shing yoki default d.m4a / l.m4a ishlatiladi</span>
-        </div>
+        <div class="pl-empty" id="pl-empty" style="display:none">Pleylist bo'sh.</div>
       </div>
-
     </div>
   </div>
 </div>
@@ -555,9 +509,7 @@ input,textarea,select,button{font-family:var(--f)}
 </div>
 
 <!-- STICKER PICKER -->
-<div class="spick" id="spick">
-  <div class="sgrid" id="sgrid"></div>
-</div>
+<div class="spick" id="spick"><div class="sgrid" id="sgrid"></div></div>
 
 <!-- ATTACH MENU -->
 <div class="amenu" id="amenu">
@@ -587,17 +539,17 @@ input,textarea,select,button{font-family:var(--f)}
 <div class="ov" id="ov-chpw">
   <div class="mbox">
     <div class="mbox-h"><div class="mbox-t">🔑 Parolni o'zgartirish</div><button class="mbox-cl" onclick="clOv('ov-chpw')">✕</button></div>
-    <div class="sp-fg"><label class="sp-fl">Joriy parol</label><input class="mi" id="cp-cur" type="password" placeholder="Hozirgi parolingiz"></div>
-    <div class="sp-fg"><label class="sp-fl">Yangi parol</label><input class="mi" id="cp-new" type="password" placeholder="Yangi parol"></div>
-    <div class="sp-fg"><label class="sp-fl">Tasdiqlash</label><input class="mi" id="cp-cf" type="password" placeholder="Qaytaring"></div>
+    <div class="sp-fg"><label class="sp-fl">Joriy parol</label><input class="mi" id="cp-cur" type="password"></div>
+    <div class="sp-fg"><label class="sp-fl">Yangi parol</label><input class="mi" id="cp-new" type="password"></div>
+    <div class="sp-fg"><label class="sp-fl">Tasdiqlash</label><input class="mi" id="cp-cf" type="password"></div>
     <div class="err" id="cp-err"></div>
     <div class="ma"><button class="bs" onclick="clOv('ov-chpw')">Bekor</button><button class="bp" style="flex:1;margin-top:0" onclick="savePw()">O'zgartirish</button></div>
   </div>
 </div>
 
-<!-- CALL OVERLAY -->
+<!-- ══ CALL OVERLAY ══ -->
 <div class="call-ov" id="call-ov">
-  <!-- Incoming / Outgoing screen -->
+  <!-- Kiruvchi / Chiquvchi ekran -->
   <div class="c-inc" id="c-inc">
     <div class="c-rings">
       <div class="cring"></div><div class="cring"></div><div class="cring"></div>
@@ -606,25 +558,25 @@ input,textarea,select,button{font-family:var(--f)}
     <div class="cnm" id="cnm-inc"></div>
     <div class="ctype" id="ctype-lbl">AUDIO QO'NG'IROQ</div>
     <div class="csub" id="csub-lbl">Qo'ng'iroq qilmoqda...</div>
-    <!-- Incoming buttons -->
+    <!-- Kiruvchi tugmalar -->
     <div class="c-inc-btns" id="c-inc-btns" style="display:none">
-      <div style="position:relative;display:flex;flex-direction:column;align-items:center">
+      <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:24px">
         <button class="cbig dec" onclick="declineCall()">📵</button>
-        <span class="cbig-lbl">Rad etish</span>
+        <span style="font-size:10.5px;font-weight:700;color:var(--tx2)">Rad etish</span>
       </div>
-      <div style="position:relative;display:flex;flex-direction:column;align-items:center">
+      <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:24px">
         <button class="cbig acc" id="acc-btn" onclick="acceptCall()">📞</button>
-        <span class="cbig-lbl">Qabul qilish</span>
+        <span style="font-size:10.5px;font-weight:700;color:var(--tx2)">Qabul qilish</span>
       </div>
     </div>
-    <!-- Outgoing cancel button -->
-    <div id="c-out-btns" style="display:none;margin-top:10px;display:none;flex-direction:column;align-items:center;gap:8px">
+    <!-- Chiquvchi bekor qilish -->
+    <div id="c-out-btns" style="display:none;flex-direction:column;align-items:center;gap:8px;margin-top:10px">
       <button class="cbig dec" onclick="cancelOutgoing()">📵</button>
       <span style="font-size:11px;color:var(--tx3)">Bekor qilish</span>
     </div>
   </div>
 
-  <!-- Active call screen -->
+  <!-- Faol qo'ng'iroq ekrani -->
   <div class="c-act" id="c-act">
     <img class="cav" id="cav-act" src="" alt="">
     <div class="cnm" id="cnm-act"></div>
@@ -637,10 +589,10 @@ input,textarea,select,button{font-family:var(--f)}
       </div>
     </div>
     <div class="cbtns">
-      <button class="cbtn side" id="cb-mut" onclick="togMute()">🎤</button>
-      <button class="cbtn side" id="cb-spk" onclick="togSpk()">🔊</button>
-      <button class="cbtn end" onclick="endCall()">📵</button>
-      <button class="cbtn side" id="cb-cam" onclick="togCam()" style="display:none">📷</button>
+      <button class="cbtn side" id="cb-mut" onclick="togMute()" title="Mikrofon">🎤</button>
+      <button class="cbtn side" id="cb-spk" onclick="togSpk()" title="Dinamik">🔊</button>
+      <button class="cbtn end" onclick="endCall()" title="Tugatish">📵</button>
+      <button class="cbtn side" id="cb-cam" onclick="togCam()" title="Kamera" style="display:none">📷</button>
     </div>
   </div>
 </div>
@@ -652,7 +604,6 @@ input,textarea,select,button{font-family:var(--f)}
 </div>
 
 <div class="toast" id="toast"></div>
-
 <audio id="au-ntf" preload="auto"></audio>
 <audio id="au-mus" loop preload="auto"></audio>
 <audio id="au-rng" loop preload="auto"></audio>
@@ -695,92 +646,369 @@ let callState='idle'; // idle | ringing_out | ringing_in | active
 let profCache={},prefs={},isDark=true,themOnline=false,msgCache={};
 let unsMsg=null,unsTyp=null,unsOnl=null,unsPrf=null,unsWC=null;
 
-/* ══ WebRTC ══ */
-let pc=null,localStream=null;
+/* ══ WebRTC ══
+   TUZATILGAN ARXITEKTURA:
+   
+   Firebase yo'llari:
+     webrtc/calls/<callId>/offer   — caller yozadi
+     webrtc/calls/<callId>/answer  — callee yozadi
+     webrtc/calls/<callId>/ice/<uid>/<pushKey>  — ICE kandidatlar (overwrite bo'lmaydi!)
+     webrtc/calls/<callId>/state   — 'ringing'|'active'|'ended'
+   
+   callId = caller_uid + '_' + callee_uid (har doim kichik tartibda)
+   
+   Bu arxitektura ICE kandidatlarni list sifatida saqlaydi,
+   overwrite muammosini butunlay hal qiladi.
+══ */
+
+let pc=null,localStream=null,currentCallId=null;
+let pendingCandidates=[]; // remote description kelgunga qadar saqlash
+
 const ICE_CFG={iceServers:[
  {urls:'stun:stun.l.google.com:19302'},
  {urls:'stun:stun1.l.google.com:19302'},
  {urls:'stun:stun2.l.google.com:19302'},
- {urls:'stun:stun3.l.google.com:19302'},
+ {urls:'stun:global.stun.twilio.com:3478'},
 ]};
 
-/* ══ Audio ══ */
+function getCallId(a,b){return[a,b].sort().join('_');}
+function callRef(...p){return R('webrtc','calls',currentCallId,...p);}
+
+function dbg(msg){
+ const el=$('dbg');if(!el)return;
+ el.classList.add('show');
+ el.innerHTML=(el.innerHTML+'\n'+msg).split('\n').slice(-8).join('\n');
+ console.log('[WebRTC]',msg);
+}
+
+async function createPC(){
+ if(pc){try{pc.close();}catch(e){}pc=null;}
+ pendingCandidates=[];
+ pc=new RTCPeerConnection(ICE_CFG);
+ dbg('PC yaratildi');
+
+ // ICE kandidatlarni Firebase'ga yuborish (push — overwrite yo'q!)
+ pc.onicecandidate=({candidate})=>{
+  if(!candidate||!currentCallId)return;
+  push(callRef('ice',me),candidate.toJSON()).catch(e=>dbg('ICE yuborish xato:'+e));
+  dbg('ICE yuborildi');
+ };
+
+ pc.oniceconnectionstatechange=()=>{
+  dbg('ICE holat: '+pc?.iceConnectionState);
+  if(pc&&pc.iceConnectionState==='connected'){
+   dbg('✅ P2P ulandi!');
+   if(callState==='active'){$('c-st').textContent=isVid?"Video qo'ng'iroq":"Audio qo'ng'iroq";}
+  }
+ };
+
+ pc.onconnectionstatechange=()=>{
+  dbg('PC holat: '+pc?.connectionState);
+  if(pc&&(pc.connectionState==='failed'||pc.connectionState==='disconnected')){
+   toast("📵 Ulanish uzildi");
+   endCallLocal(true);
+  }
+ };
+
+ // Remote track qabul qilish
+ pc.ontrack=({track,streams})=>{
+  dbg('Remote track: '+track.kind);
+  const rv=$('vid-remote');
+  if(!rv.srcObject)rv.srcObject=new MediaStream();
+  rv.srcObject.addTrack(track);
+  rv.play().catch(()=>{});
+ };
+
+ return pc;
+}
+
+// Remote description o'rnatilgandan keyin pending ICE larni qo'shish
+async function flushPendingCandidates(){
+ dbg('Pending ICE flush: '+pendingCandidates.length);
+ for(const c of pendingCandidates){
+  try{await pc.addIceCandidate(new RTCIceCandidate(c));}
+  catch(e){dbg('ICE qo\'shish xato:'+e);}
+ }
+ pendingCandidates=[];
+}
+
+// Qarshi tomon ICE kandidatlarini kuzatish
+let unsICE=null;
+function subICE(){
+ if(unsICE){unsICE();unsICE=null;}
+ if(!currentCallId)return;
+ // Biz ularning ICE larini tinglаymiz
+ unsICE=onValue(callRef('ice',them),async snap=>{
+  if(!snap.exists()||!pc)return;
+  snap.forEach(child=>{
+   const c=child.val();
+   if(!c)return;
+   if(pc.remoteDescription){
+    pc.addIceCandidate(new RTCIceCandidate(c)).catch(e=>dbg('ICE add xato:'+e));
+   }else{
+    pendingCandidates.push(c);
+   }
+  });
+ });
+}
+
+/* ══ Chiquvchi qo'ng'iroq ══ */
+window.startACall=()=>{if(callState!=='idle'){toast("Allaqachon qo'ng'iroq mavjud");return;}isVid=false;initiateCall();};
+window.startVCall=()=>{if(callState!=='idle'){toast("Allaqachon qo'ng'iroq mavjud");return;}isVid=true;initiateCall();};
+
+async function initiateCall(){
+ currentCallId=getCallId(me,them);
+ dbg('Chiquvchi: '+currentCallId+' vid='+isVid);
+
+ // Media olish
+ try{
+  const c=isVid?{video:{width:{ideal:640},height:{ideal:480},facingMode:'user'},audio:true}:{audio:true,video:false};
+  localStream=await navigator.mediaDevices.getUserMedia(c);
+  dbg('Media olindi');
+ }catch(e){
+  toast("❌ Mikrofon/kamera ruxsati yo'q: "+e.message);
+  callState='idle';currentCallId=null;return;
+ }
+
+ await createPC();
+ localStream.getTracks().forEach(t=>pc.addTrack(t,localStream));
+ dbg('Tracks qo\'shildi');
+
+ if(isVid){$('vid-local').srcObject=localStream;$('vid-local').play().catch(()=>{});$('cb-cam').style.display='flex';}
+ else{$('cb-cam').style.display='none';}
+
+ // ICE tinglashni boshlash
+ subICE();
+
+ // Offer yaratish
+ const offer=await pc.createOffer({offerToReceiveAudio:true,offerToReceiveVideo:isVid});
+ await pc.setLocalDescription(offer);
+ dbg('Offer yaratildi');
+
+ // Firebase'ga offer yozish + holat
+ await set(callRef(),{
+  offer:{type:offer.type,sdp:offer.sdp},
+  isVideo:isVid,
+  caller:me,
+  callee:them,
+  state:'ringing',
+  ts:Date.now()
+ });
+ dbg('Offer yozildi Firebase\'ga');
+
+ callState='ringing_out';
+ showRingUI(true,them,isVid);
+ auRng.play().catch(()=>{});
+}
+
+/* ══ Kiruvchi qo'ng'iroq ══ */
+function subWebRTC(){
+ if(unsWC)unsWC();
+ // Bizga kelgan qo'ng'iroqlarni kuzatish
+ // callId da biz ham caller ham callee bo'lishimiz mumkin
+ // Shuning uchun barcha qo'ng'iroqlarni tekshiramiz
+ unsWC=onValue(R('webrtc','calls'),async snap=>{
+  if(!snap.exists())return;
+  snap.forEach(child=>{
+   const callId=child.key;
+   const v=child.val();
+   if(!v)return;
+
+   // Bizga kelgan qo'ng'iroq (biz callee)
+   if(v.callee===me&&v.state==='ringing'&&callState==='idle'){
+    dbg('Kiruvchi qo\'ng\'iroq: '+callId);
+    currentCallId=callId;
+    isVid=v.isVideo||false;
+    callState='ringing_in';
+    window._incomingData=v;
+    showRingUI(false,v.caller||them,isVid);
+    auRng.play().catch(()=>{});
+   }
+
+   // Answer keldi (biz caller)
+   if(v.caller===me&&v.state==='ringing'&&v.answer&&pc&&callState==='ringing_out'){
+    dbg('Answer qabul qilindi');
+    if(!pc.remoteDescription){
+     pc.setRemoteDescription(new RTCSessionDescription(v.answer))
+      .then(()=>{
+       dbg('Remote desc o\'rnatildi (answer)');
+       return flushPendingCandidates();
+      })
+      .then(()=>{
+       callState='active';
+       update(callRef(),{state:'active'});
+       activateCallUI();
+      })
+      .catch(e=>dbg('setRemoteDesc xato:'+e));
+    }
+   }
+
+   // Qo'ng'iroq tugadi
+   if((v.caller===me||v.callee===me)&&v.state==='ended'&&callState!=='idle'){
+    dbg('Qo\'ng\'iroq tugadi (remote)');
+    if(callState==='active')toast("📵 Qo'ng'iroq tugadi");
+    endCallLocal(false);
+   }
+  });
+ });
+}
+
+function showRingUI(isOutgoing,fromUid,video){
+ $('cav-inc').src=getAv(fromUid);
+ $('cnm-inc').textContent=getName(fromUid);
+ $('ctype-lbl').textContent=video?"VIDEO QO'NG'IROQ":"AUDIO QO'NG'IROQ";
+ $('csub-lbl').textContent=isOutgoing?"Chaqirilmoqda...":"Qo'ng'iroq qilmoqda...";
+ $('c-inc-btns').style.display=isOutgoing?'none':'flex';
+ $('c-out-btns').style.display=isOutgoing?'flex':'none';
+ $('acc-btn').textContent=video?'📹':'📞';
+ $('c-inc').style.display='flex';
+ $('c-act').classList.remove('show');
+ $('call-ov').classList.add('show');
+}
+
+/* ══ Qabul qilish ══ */
+window.acceptCall=async()=>{
+ auRng.pause();
+ const v=window._incomingData;
+ if(!v||!v.offer){endCallLocal(false);return;}
+ dbg('Qabul qilinmoqda...');
+
+ try{
+  const c=isVid?{video:{width:{ideal:640},height:{ideal:480},facingMode:'user'},audio:true}:{audio:true,video:false};
+  localStream=await navigator.mediaDevices.getUserMedia(c);
+ }catch(e){
+  toast("❌ Ruxsat yo'q: "+e.message);endCallLocal(false);return;
+ }
+
+ await createPC();
+ localStream.getTracks().forEach(t=>pc.addTrack(t,localStream));
+
+ if(isVid){$('vid-local').srcObject=localStream;$('vid-local').play().catch(()=>{});$('cb-cam').style.display='flex';}
+ else{$('cb-cam').style.display='none';}
+
+ // ICE tinglashni boshlash (caller ning ICE larini)
+ subICE();
+
+ // Offer o'rnatish
+ await pc.setRemoteDescription(new RTCSessionDescription(v.offer));
+ dbg('Remote desc o\'rnatildi (offer)');
+ await flushPendingCandidates();
+
+ // Answer yaratish
+ const answer=await pc.createAnswer();
+ await pc.setLocalDescription(answer);
+ dbg('Answer yaratildi');
+
+ // Firebase'ga answer yozish
+ await update(callRef(),{
+  answer:{type:answer.type,sdp:answer.sdp},
+  state:'ringing' // caller active ga o'tkazadi
+ });
+ dbg('Answer yozildi');
+
+ callState='active';
+ activateCallUI();
+ window._incomingData=null;
+};
+
+window.declineCall=async()=>{
+ auRng.pause();
+ if(currentCallId)await update(callRef(),{state:'ended'}).catch(()=>{});
+ callState='idle';window._incomingData=null;
+ $('call-ov').classList.remove('show');
+ setTimeout(()=>{if(currentCallId)remove(callRef()).catch(()=>{});currentCallId=null;},2000);
+};
+
+window.cancelOutgoing=async()=>{
+ auRng.pause();
+ dbg('Chiquvchi bekor qilindi');
+ if(currentCallId)await update(callRef(),{state:'ended'}).catch(()=>{});
+ endCallLocal(false);
+ setTimeout(()=>{if(currentCallId)remove(callRef()).catch(()=>{});currentCallId=null;},2000);
+};
+
+function activateCallUI(){
+ $('c-inc').style.display='none';
+ $('c-act').classList.add('show');
+ $('cav-act').src=getAv(them);
+ $('cnm-act').textContent=getName(them);
+ $('c-st').textContent=isVid?"Video qo'ng'iroq":"Audio qo'ng'iroq";
+ if(isVid){$('vid-area').classList.add('show');if(localStream){$('vid-local').srcObject=localStream;$('vid-local').play().catch(()=>{});}}
+ else $('vid-area').classList.remove('show');
+ callSecs=0;$('c-tm').textContent='00:00';clearInterval(callTim);
+ callTim=setInterval(()=>{callSecs++;$('c-tm').textContent=String(Math.floor(callSecs/60)).padStart(2,'0')+':'+String(callSecs%60).padStart(2,'0');},1000);
+ isMuted=false;isCamOff=false;isSpkOff=false;
+ $('cb-mut').classList.remove('act');$('cb-cam').classList.remove('act');$('cb-spk').classList.remove('act');
+ $('cb-mut').textContent='🎤';$('cb-cam').textContent='📷';$('cb-spk').textContent='🔊';
+ dbg('✅ Qo\'ng\'iroq faollashdi');
+}
+
+window.endCall=async()=>{
+ dbg('Qo\'ng\'iroq tugatilmoqda');
+ if(currentCallId)await update(callRef(),{state:'ended'}).catch(()=>{});
+ const dur=callSecs>0?' ('+String(Math.floor(callSecs/60)).padStart(2,'0')+':'+String(callSecs%60).padStart(2,'0')+')':'';
+ await push(R('messages'),{from:me,type:'text',text:(isVid?"📹 Video":"📞 Audio")+" qo'ng'iroq tugadi"+dur,time:Date.now(),seen:false});
+ endCallLocal(false);
+ setTimeout(()=>{if(currentCallId)remove(callRef()).catch(()=>{});currentCallId=null;},3000);
+};
+
+function endCallLocal(cleanupNode){
+ clearInterval(callTim);
+ auRng.pause();
+ if(unsICE){unsICE();unsICE=null;}
+ if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null;}
+ const rv=$('vid-remote'),lv=$('vid-local');
+ if(rv?.srcObject){try{rv.srcObject.getTracks().forEach(t=>t.stop());}catch(e){}rv.srcObject=null;}
+ if(lv?.srcObject)lv.srcObject=null;
+ if(pc){try{pc.close();}catch(e){}pc=null;}
+ $('call-ov').classList.remove('show');
+ $('c-inc').style.display='flex';
+ $('c-act').classList.remove('show');
+ $('c-inc-btns').style.display='none';
+ $('c-out-btns').style.display='none';
+ callState='idle';
+ window._incomingData=null;
+ pendingCandidates=[];
+ dbg('Qo\'ng\'iroq tugatildi');
+}
+
+window.togMute=()=>{isMuted=!isMuted;if(localStream)localStream.getAudioTracks().forEach(t=>{t.enabled=!isMuted;});$('cb-mut').textContent=isMuted?'🔇':'🎤';$('cb-mut').classList.toggle('act',isMuted);};
+window.togCam=()=>{isCamOff=!isCamOff;if(localStream)localStream.getVideoTracks().forEach(t=>{t.enabled=!isCamOff;});$('cb-cam').textContent=isCamOff?'🚫':'📷';$('cb-cam').classList.toggle('act',isCamOff);};
+window.togSpk=()=>{isSpkOff=!isSpkOff;const rv=$('vid-remote');if(rv)rv.muted=isSpkOff;$('cb-spk').textContent=isSpkOff?'🔕':'🔊';$('cb-spk').classList.toggle('act',isSpkOff);};
+
+/* ══ Audio / Playlist ══ */
 const auMus=$('au-mus'),auNtf=$('au-ntf'),auRng=$('au-rng');
 auNtf.src='notification.mp3';
 auRng.src='ringtone.m4a';
-
-/* ══ Playlist ══ */
-let playlist=[],curTrack=0,plMode='repeat'; // repeat | queue | shuffle
+let playlist=[],curTrack=0,plMode='repeat';
 
 function updMusUI(){
  const playing=!auMus.paused&&prefs.musicOn!==false;
  const mb=$('mbars');if(mb)mb.style.display=playing?'inline-flex':'none';
  const pp=$('pl-pp-btn');if(pp)pp.textContent=auMus.paused?'▶':'⏸';
- const nm=$('pl-now-name');
- if(nm)nm.textContent=playlist.length?(playlist[curTrack]?.name||'—'):(isDark?'d.m4a':'l.m4a');
- const ms=$('mus-sub');if(ms)ms.textContent=prefs.musicOn===false?"O'chirilgan":"Yoqilgan · "+(isDark?'Dark':'Light');
+ const nm=$('pl-now-name');if(nm)nm.textContent=playlist.length?(playlist[curTrack]?.name||'—'):(isDark?'d.m4a':'l.m4a');
+ const ms=$('mus-sub');if(ms)ms.textContent=prefs.musicOn===false?"O'chirilgan":"Yoqilgan";
  const ic=$('pl-now-ico');if(ic)ic.textContent=playing?'🎶':'🎵';
 }
 function renderPlaylist(){
  const list=$('pl-list'),empty=$('pl-empty');if(!list)return;
  if(!playlist.length){list.innerHTML='';if(empty)empty.style.display='block';return;}
  if(empty)empty.style.display='none';
- list.innerHTML=playlist.map((t,i)=>`
-  <div class="pl-item${i===curTrack&&!auMus.paused?' playing':''}" onclick="playTrackIdx(${i})">
-   <span class="pl-num">${i===curTrack&&!auMus.paused?'▶':i+1}</span>
-   <span class="pl-name" title="${esc(t.name)}">${esc(t.name)}</span>
-   <button class="pl-del" onclick="event.stopPropagation();delTrack(${i})" title="O'chirish">✕</button>
-  </div>`).join('');
+ list.innerHTML=playlist.map((t,i)=>`<div class="pl-item${i===curTrack&&!auMus.paused?' playing':''}" onclick="playTrackIdx(${i})"><span class="pl-num">${i===curTrack&&!auMus.paused?'▶':i+1}</span><span class="pl-name" title="${esc(t.name)}">${esc(t.name)}</span><button class="pl-del" onclick="event.stopPropagation();delTrack(${i})">✕</button></div>`).join('');
 }
-function playTrackIdx(i){
- curTrack=i;const t=playlist[i];if(!t||!t.src){useDefaultMusic();return;}
- auMus.src=t.src;auMus.load();
- if(prefs.musicOn!==false)auMus.play().catch(()=>{});
- updMusUI();renderPlaylist();savePlMeta();
-}
-function useDefaultMusic(){
- auMus.src=isDark?'d.m4a':'l.m4a';auMus.load();auMus.loop=true;
- if(prefs.musicOn!==false)auMus.play().catch(()=>{});
- updMusUI();
-}
+function playTrackIdx(i){curTrack=i;const t=playlist[i];if(!t?.src){useDefaultMusic();return;}auMus.src=t.src;auMus.load();if(prefs.musicOn!==false)auMus.play().catch(()=>{});updMusUI();renderPlaylist();savePlMeta();}
+function useDefaultMusic(){auMus.src=isDark?'d.m4a':'l.m4a';auMus.load();auMus.loop=true;if(prefs.musicOn!==false)auMus.play().catch(()=>{});updMusUI();}
 function startMusic(){if(playlist.length&&playlist[curTrack]?.src)playTrackIdx(curTrack);else useDefaultMusic();}
-function stopMusic(){auMus.pause();updMusUI();}
-auMus.addEventListener('ended',()=>{
- if(plMode==='repeat'){auMus.play().catch(()=>{});return;}
- if(!playlist.length){useDefaultMusic();return;}
- if(plMode==='shuffle'){const n=Math.floor(Math.random()*playlist.length);playTrackIdx(n);}
- else{const n=(curTrack+1)%playlist.length;playTrackIdx(n);}
-});
-function prevTrack(){if(!playlist.length){useDefaultMusic();return;}const n=(curTrack-1+playlist.length)%playlist.length;playTrackIdx(n);}
-function nextTrack(){if(!playlist.length){useDefaultMusic();return;}const n=(curTrack+1)%playlist.length;playTrackIdx(n);}
+auMus.addEventListener('ended',()=>{if(plMode==='repeat'){auMus.play().catch(()=>{});return;}if(!playlist.length){useDefaultMusic();return;}if(plMode==='shuffle'){playTrackIdx(Math.floor(Math.random()*playlist.length));}else{playTrackIdx((curTrack+1)%playlist.length);}});
+function prevTrack(){if(!playlist.length){useDefaultMusic();return;}playTrackIdx((curTrack-1+playlist.length)%playlist.length);}
+function nextTrack(){if(!playlist.length){useDefaultMusic();return;}playTrackIdx((curTrack+1)%playlist.length);}
 function playPause(){auMus.paused?auMus.play().catch(()=>{}):auMus.pause();updMusUI();renderPlaylist();}
-function delTrack(i){
- const t=playlist[i];if(t?.isBlob&&t.src?.startsWith('blob:'))URL.revokeObjectURL(t.src);
- playlist.splice(i,1);if(curTrack>=playlist.length)curTrack=Math.max(0,playlist.length-1);
- if(playlist.length)playTrackIdx(curTrack);else useDefaultMusic();
- savePlMeta();renderPlaylist();
-}
+function delTrack(i){const t=playlist[i];if(t?.isBlob&&t.src?.startsWith('blob:'))URL.revokeObjectURL(t.src);playlist.splice(i,1);if(curTrack>=playlist.length)curTrack=Math.max(0,playlist.length-1);if(playlist.length)playTrackIdx(curTrack);else useDefaultMusic();savePlMeta();renderPlaylist();}
 function savePlMeta(){if(!me)return;const s=playlist.filter(t=>!t.isBlob).map(t=>({name:t.name,src:t.src}));localStorage.setItem('pc_pl_'+me,JSON.stringify(s));localStorage.setItem('pc_plm_'+me,plMode);}
-function loadPlMeta(){
- if(!me)return;
- plMode=localStorage.getItem('pc_plm_'+me)||'repeat';
- const s=localStorage.getItem('pc_pl_'+me);
- if(s)try{JSON.parse(s).forEach(t=>{if(t?.name&&t?.src)playlist.push({name:t.name,src:t.src,isBlob:false});});}catch(e){}
- renderPlaylist();
-}
+function loadPlMeta(){if(!me)return;plMode=localStorage.getItem('pc_plm_'+me)||'repeat';const s=localStorage.getItem('pc_pl_'+me);if(s)try{JSON.parse(s).forEach(t=>{if(t?.name&&t?.src)playlist.push({name:t.name,src:t.src,isBlob:false});});}catch(e){}renderPlaylist();}
 window.prevTrack=prevTrack;window.nextTrack=nextTrack;window.playPause=playPause;window.playTrackIdx=playTrackIdx;window.delTrack=delTrack;
-window.addTracks=e=>{
- Array.from(e.target.files).forEach(f=>{playlist.push({name:f.name.replace(/\.[^.]+$/,''),src:URL.createObjectURL(f),isBlob:true});});
- if(playlist.length===e.target.files.length)playTrackIdx(0);else renderPlaylist();
- e.target.value='';toast(`✓ ${e.target.files.length} ta musiqa qo'shildi`);
-};
-window.setPlMode=mode=>{
- plMode=mode;
- ['rep','que','shuf'].forEach(m=>$('pm-'+m)?.classList.remove('on'));
- $('pm-'+(mode==='repeat'?'rep':mode==='queue'?'que':'shuf'))?.classList.add('on');
- auMus.loop=(mode==='repeat');savePlMeta();
-};
-function setPlMode(m){window.setPlMode(m);}
+window.addTracks=e=>{Array.from(e.target.files).forEach(f=>{playlist.push({name:f.name.replace(/\.[^.]+$/,''),src:URL.createObjectURL(f),isBlob:true});});if(playlist.length===e.target.files.length)playTrackIdx(0);else renderPlaylist();e.target.value='';toast(`✓ ${e.target.files.length} ta musiqa qo'shildi`);};
+window.setPlMode=mode=>{plMode=mode;['rep','que','shuf'].forEach(m=>$('pm-'+m)?.classList.remove('on'));$('pm-'+(mode==='repeat'?'rep':mode==='queue'?'que':'shuf'))?.classList.add('on');auMus.loop=(mode==='repeat');savePlMeta();};
 function playNtf(){if(prefs.notifOn===false)return;auNtf.currentTime=0;auNtf.play().catch(()=>{});}
 
 /* ══ Helpers ══ */
@@ -792,7 +1020,7 @@ function fmtT(ts){if(!ts)return'';return new Date(ts).toLocaleTimeString('uz-UZ'
 function fmtD(ts){if(!ts)return'';const d=new Date(ts),now=new Date();now.setHours(0,0,0,0);const yes=new Date(now);yes.setDate(yes.getDate()-1);if(d>=now)return'Bugun';if(d>=yes)return'Kecha';return d.toLocaleDateString('uz-UZ',{day:'numeric',month:'long',year:'numeric'});}
 function fmtDob(dob){if(!dob)return'';try{return new Date(dob).toLocaleDateString('uz-UZ',{day:'numeric',month:'long',year:'numeric'});}catch(e){return dob;}}
 function getAv(u){return(profCache[u]&&profCache[u].avatar)||DEF_AVS[u==='user_1'?0:1];}
-function getName(u){return(profCache[u]&&profCache[u].name)||USERS[u].defNick;}
+function getName(u){return(profCache[u]&&profCache[u].name)||USERS[u]?.defNick||u;}
 
 /* ══ Auth ══ */
 window.eyeTog=(id,btn)=>{const el=$(id);el.type=el.type==='password'?'text':'password';btn.textContent=el.type==='password'?'👁':'🙈';};
@@ -817,7 +1045,6 @@ document.addEventListener('keydown',e=>{
  if($('pg-chat').classList.contains('act')&&document.activeElement===$('msgi')&&!e.shiftKey){e.preventDefault();sendMsg();}
 });
 
-/* ══ Enter chat ══ */
 async function enterChat(uid){
  me=uid;them=uid==='user_1'?'user_2':'user_1';
  showPg('pg-chat');loadPrefs();updateBg();
@@ -844,9 +1071,8 @@ function applyPrefs(){
  const ml=$('mvol-lbl');if(ml)ml.textContent=(prefs.musicVol||40)+'%';
  const nl=$('nvol-lbl');if(nl)nl.textContent=(prefs.notifVol||70)+'%';
  const dk=$('tog-dk');if(dk)dk.checked=isDark;
- // Apply playlist mode buttons
- ['rep','que','shuf'].forEach(m=>$('pm-'+m)?.classList.remove('on'));
  const mmap={repeat:'rep',queue:'que',shuffle:'shuf'};
+ ['rep','que','shuf'].forEach(m=>$('pm-'+m)?.classList.remove('on'));
  $('pm-'+(mmap[plMode]||'rep'))?.classList.add('on');
 }
 function savePrefs(){if(me)localStorage.setItem('pc_p_'+me,JSON.stringify(prefs));}
@@ -862,7 +1088,6 @@ async function loadProfiles(){
 function updHdr(){$('h-av').src=getAv(them);$('h-name').textContent=getName(them);}
 function updateBg(){if(!me)return;$('bgl').style.backgroundImage=`url('${BG[me][isDark?'dark':'light']}')`;}
 
-/* ══ Subscriptions ══ */
 function subMsg(){
  if(unsMsg)unsMsg();let first=true;
  unsMsg=onValue(R('messages'),snap=>{
@@ -906,291 +1131,6 @@ function subPrf(){
   if(me){updHdr();if($('pg-sett').classList.contains('act'))loadSettData();}
  });
 }
-
-/* ══════════════════════════════════════════════
-   WebRTC — COMPLETE AUDIO/VIDEO CALL SYSTEM
-   
-   Signaling via Firebase Realtime Database:
-   webrtc/<uid>/  ← each user reads their own node
-     signal: {type: offer|answer|candidate|bye, ...}
-     from: uid
-     isVideo: bool
-     ts: timestamp
-   
-   Flow:
-   1. Caller creates offer, writes to webrtc/them
-   2. Callee reads offer, creates answer, writes to webrtc/caller
-   3. Both exchange ICE candidates via webrtc/<their_uid>
-   4. Connection established, audio/video flows directly P2P
-══════════════════════════════════════════════ */
-
-async function createPC(){
- if(pc){try{pc.close();}catch(e){}pc=null;}
- pc=new RTCPeerConnection(ICE_CFG);
-
- // Send ICE candidates to the other side
- pc.onicecandidate=({candidate})=>{
-  if(candidate){
-   sendWS(them,{type:'candidate',candidate:candidate.toJSON()});
-  }
- };
-
- // Receive remote tracks — this is where audio/video comes in
- pc.ontrack=({track,streams})=>{
-  const rv=$('vid-remote');
-  if(!rv.srcObject){rv.srcObject=new MediaStream();}
-  rv.srcObject.addTrack(track);
-  // Must play() — especially needed on mobile
-  rv.play().catch(()=>{});
- };
-
- pc.onconnectionstatechange=()=>{
-  console.log('WebRTC state:',pc?.connectionState);
-  if(pc&&(pc.connectionState==='failed'||pc.connectionState==='disconnected')){
-   endCallLocal(false);
-   toast("📵 Ulanish uzildi");
-  }
- };
-
- pc.oniceconnectionstatechange=()=>{
-  console.log('ICE state:',pc?.iceConnectionState);
- };
-
- return pc;
-}
-
-async function sendWS(target,signal,extra={}){
- await set(R('webrtc',target),{signal,from:me,...extra,ts:Date.now()});
-}
-
-function subWebRTC(){
- if(unsWC)unsWC();
- unsWC=onValue(R('webrtc',me),async snap=>{
-  const v=snap.val();if(!v||!v.signal)return;
-  const sig=v.signal;
-  const from=v.from;
-
-  if(sig.type==='offer'&&callState==='idle'){
-   // Incoming call
-   isVid=v.isVideo||false;
-   callState='ringing_in';
-   window._incomingOffer=v;
-   showRingUI(false, v.from||them, isVid);
-   auRng.play().catch(()=>{});
-
-  }else if(sig.type==='answer'&&pc&&callState==='ringing_out'){
-   // Our offer was answered
-   try{
-    await pc.setRemoteDescription(new RTCSessionDescription(sig));
-    callState='active';
-    activateCallUI();
-   }catch(e){console.error('setRemoteDesc answer error:',e);}
-
-  }else if(sig.type==='candidate'&&pc){
-   // ICE candidate from other side
-   try{
-    if(pc.remoteDescription){
-     await pc.addIceCandidate(new RTCIceCandidate(sig.candidate));
-    }else{
-     // Queue it
-     window._iceBuf=window._iceBuf||[];
-     window._iceBuf.push(sig.candidate);
-    }
-   }catch(e){console.warn('addIceCandidate error:',e);}
-
-  }else if(sig.type==='bye'){
-   endCallLocal(true);
-   if(callState==='active')toast("📵 Qo'ng'iroq tugadi");
-  }
- });
-}
-
-// Flush queued ICE candidates after setRemoteDescription
-async function flushIceBuf(){
- if(!window._iceBuf||!pc)return;
- for(const c of window._iceBuf){
-  try{await pc.addIceCandidate(new RTCIceCandidate(c));}catch(e){}
- }
- window._iceBuf=[];
-}
-
-/* Outgoing call */
-window.startACall=()=>{if(callState!=='idle'){toast("Allaqachon qo'ng'iroq mavjud");return;}isVid=false;initiateCall();};
-window.startVCall=()=>{if(callState!=='idle'){toast("Allaqachon qo'ng'iroq mavjud");return;}isVid=true;initiateCall();};
-
-async function initiateCall(){
- callState='ringing_out';
- window._iceBuf=[];
-
- // Get media
- try{
-  const constraints=isVid?{video:{width:{ideal:640},height:{ideal:480},facingMode:'user'},audio:true}:{audio:true,video:false};
-  localStream=await navigator.mediaDevices.getUserMedia(constraints);
- }catch(e){
-  toast("❌ Mikrofon/kamera ruxsati yo'q");callState='idle';return;
- }
-
- await createPC();
- localStream.getTracks().forEach(t=>pc.addTrack(t,localStream));
-
- // Show local video preview
- if(isVid){
-  $('vid-local').srcObject=localStream;
-  $('vid-local').play().catch(()=>{});
-  $('cb-cam').style.display='flex';
- }else{
-  $('cb-cam').style.display='none';
- }
-
- // Create offer
- const offer=await pc.createOffer({offerToReceiveAudio:true,offerToReceiveVideo:isVid});
- await pc.setLocalDescription(offer);
-
- // Send offer to other side
- await sendWS(them,pc.localDescription.toJSON(),{isVideo:isVid,from:me});
-
- // Show outgoing UI
- showRingUI(true, them, isVid);
- auRng.play().catch(()=>{});
-}
-
-function showRingUI(isOutgoing, fromUid, video){
- $('cav-inc').src=getAv(fromUid);
- $('cnm-inc').textContent=getName(fromUid);
- $('ctype-lbl').textContent=video?"VIDEO QO'NG'IROQ":"AUDIO QO'NG'IROQ";
- $('csub-lbl').textContent=isOutgoing?"Chaqirilmoqda...":"Qo'ng'iroq qilmoqda...";
- if(isOutgoing){
-  $('c-inc-btns').style.display='none';
-  $('c-out-btns').style.display='flex';
- }else{
-  $('c-out-btns').style.display='none';
-  $('acc-btn').textContent=video?'📹':'📞';
-  $('c-inc-btns').style.display='flex';
- }
- $('c-inc').style.display='flex';
- $('c-act').classList.remove('show');
- $('call-ov').classList.add('show');
-}
-
-/* Accept incoming call */
-window.acceptCall=async()=>{
- auRng.pause();
- const v=window._incomingOffer;
- if(!v){endCallLocal(false);return;}
- window._iceBuf=[];
- isVid=v.isVideo||false;
-
- // Get media
- try{
-  const constraints=isVid?{video:{width:{ideal:640},height:{ideal:480},facingMode:'user'},audio:true}:{audio:true,video:false};
-  localStream=await navigator.mediaDevices.getUserMedia(constraints);
- }catch(e){
-  toast("❌ Ruxsat yo'q");endCallLocal(false);return;
- }
-
- await createPC();
- localStream.getTracks().forEach(t=>pc.addTrack(t,localStream));
-
- if(isVid){
-  $('vid-local').srcObject=localStream;
-  $('vid-local').play().catch(()=>{});
-  $('cb-cam').style.display='flex';
- }else{
-  $('cb-cam').style.display='none';
- }
-
- // Set remote description (the offer)
- await pc.setRemoteDescription(new RTCSessionDescription(v.signal));
- await flushIceBuf();
-
- // Create answer
- const answer=await pc.createAnswer();
- await pc.setLocalDescription(answer);
-
- // Send answer to caller
- await sendWS(them,pc.localDescription.toJSON());
-
- // Clean up our incoming signal so we don't re-process it
- await remove(R('webrtc',me));
- window._incomingOffer=null;
-
- callState='active';
- activateCallUI();
-};
-
-window.declineCall=async()=>{
- auRng.pause();
- await sendWS(them,{type:'bye'});
- await remove(R('webrtc',me));
- callState='idle';window._incomingOffer=null;
- $('call-ov').classList.remove('show');
-};
-
-window.cancelOutgoing=async()=>{
- auRng.pause();
- await sendWS(them,{type:'bye'});
- await remove(R('webrtc',me));
- endCallLocal(false);
-};
-
-function activateCallUI(){
- $('c-inc').style.display='none';
- $('c-act').classList.add('show');
- $('cav-act').src=getAv(them);
- $('cnm-act').textContent=getName(them);
- $('c-st').textContent=isVid?"Video qo'ng'iroq":"Audio qo'ng'iroq";
- if(isVid){
-  $('vid-area').classList.add('show');
-  if(localStream){$('vid-local').srcObject=localStream;$('vid-local').play().catch(()=>{});}
- }else{
-  $('vid-area').classList.remove('show');
- }
- callSecs=0;$('c-tm').textContent='00:00';clearInterval(callTim);
- callTim=setInterval(()=>{
-  callSecs++;
-  $('c-tm').textContent=String(Math.floor(callSecs/60)).padStart(2,'0')+':'+String(callSecs%60).padStart(2,'0');
- },1000);
- isMuted=false;isCamOff=false;isSpkOff=false;
- $('cb-mut').classList.remove('act');$('cb-cam').classList.remove('act');$('cb-spk').classList.remove('act');
- $('cb-mut').textContent='🎤';$('cb-cam').textContent='📷';$('cb-spk').textContent='🔊';
-}
-
-window.endCall=async()=>{
- await sendWS(them,{type:'bye'});
- const dur=callSecs>0?' ('+String(Math.floor(callSecs/60)).padStart(2,'0')+':'+String(callSecs%60).padStart(2,'0')+')':'';
- await push(R('messages'),{from:me,type:'text',text:(isVid?"📹 Video":"📞 Audio")+" qo'ng'iroq tugadi"+dur,time:Date.now(),seen:false});
- endCallLocal(true);
-};
-
-function endCallLocal(removeNode){
- clearInterval(callTim);auRng.pause();
- if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null;}
- const rv=$('vid-remote'),lv=$('vid-local');
- if(rv?.srcObject){try{rv.srcObject.getTracks().forEach(t=>t.stop());}catch(e){}rv.srcObject=null;}
- if(lv?.srcObject){lv.srcObject=null;}
- if(pc){try{pc.close();}catch(e){}pc=null;}
- $('call-ov').classList.remove('show');
- $('c-inc').style.display='flex';$('c-act').classList.remove('show');
- $('c-inc-btns').style.display='none';$('c-out-btns').style.display='none';
- callState='idle';window._incomingOffer=null;window._iceBuf=[];
- if(removeNode)remove(R('webrtc',me)).catch(()=>{});
-}
-
-window.togMute=()=>{
- isMuted=!isMuted;
- if(localStream)localStream.getAudioTracks().forEach(t=>{t.enabled=!isMuted;});
- $('cb-mut').textContent=isMuted?'🔇':'🎤';$('cb-mut').classList.toggle('act',isMuted);
-};
-window.togCam=()=>{
- isCamOff=!isCamOff;
- if(localStream)localStream.getVideoTracks().forEach(t=>{t.enabled=!isCamOff;});
- $('cb-cam').textContent=isCamOff?'🚫':'📷';$('cb-cam').classList.toggle('act',isCamOff);
-};
-window.togSpk=()=>{
- isSpkOff=!isSpkOff;
- const rv=$('vid-remote');if(rv)rv.muted=isSpkOff;
- $('cb-spk').textContent=isSpkOff?'🔕':'🔊';$('cb-spk').classList.toggle('act',isSpkOff);
-};
 
 /* ══ Messages ══ */
 function renderMsgs(obj){
@@ -1239,7 +1179,6 @@ function renderMsgs(obj){
  if(atBot||sorted.length<4)el.scrollTop=el.scrollHeight;
 }
 
-/* ══ Context menu ══ */
 function showCtx(e,key,isMe,m){
  e.preventDefault();ctxKey=key;
  $('ctx-cpy').style.display=m.type==='text'?'flex':'none';
@@ -1256,91 +1195,51 @@ document.addEventListener('click',e=>{
  if(!e.target.closest('#stk-btn')&&!e.target.closest('#spick'))$('spick').classList.remove('show');
  if(!e.target.closest('.iic')&&!e.target.closest('#amenu'))$('amenu').classList.remove('show');
 });
+
 window.ctxReply=async()=>{
- replyKey=ctxKey;
- const s=await get(R('messages',ctxKey));const m=s.val();if(!m)return;
+ replyKey=ctxKey;const s=await get(R('messages',ctxKey));const m=s.val();if(!m)return;
  const txt=m.type==='text'?m.text:m.type==='sticker'?m.sticker:'[media]';
  $('rb-nm').textContent=getName(m.from);$('rb-tx').textContent=txt;
  $('rbar').classList.add('show');$('ctx').style.display='none';$('msgi').focus();
 };
-window.ctxCopy=async()=>{
- const s=await get(R('messages',ctxKey));const m=s.val();
- if(m)navigator.clipboard.writeText(m.text||'').then(()=>toast('✓ Nusxa olindi'));
- $('ctx').style.display='none';
-};
-window.ctxEdit=async()=>{
- const s=await get(R('messages',ctxKey));const m=s.val();
- $('edit-inp').value=m?m.text:'';$('ov-edit').classList.add('show');$('ctx').style.display='none';
-};
-window.saveEdit=async()=>{
- const v=$('edit-inp').value.trim();if(!v)return;
- await update(R('messages',ctxKey),{text:v,edited:true});clOv('ov-edit');
-};
+window.ctxCopy=async()=>{const s=await get(R('messages',ctxKey));const m=s.val();if(m)navigator.clipboard.writeText(m.text||'').then(()=>toast('✓ Nusxa olindi'));$('ctx').style.display='none';};
+window.ctxEdit=async()=>{const s=await get(R('messages',ctxKey));const m=s.val();$('edit-inp').value=m?m.text:'';$('ov-edit').classList.add('show');$('ctx').style.display='none';};
+window.saveEdit=async()=>{const v=$('edit-inp').value.trim();if(!v)return;await update(R('messages',ctxKey),{text:v,edited:true});clOv('ov-edit');};
 window.ctxDelete=async()=>{await remove(R('messages',ctxKey));$('ctx').style.display='none';};
 window.cancelReply=()=>{replyKey=null;$('rbar').classList.remove('show');};
 
-/* ══ Send ══ */
-window.sendMsg=async()=>{
- const inp=$('msgi'),text=inp.value.trim();if(!text)return;
- const msg={from:me,type:'text',text,time:Date.now(),seen:false};
- if(replyKey){msg.replyKey=replyKey;cancelReply();}
- await push(R('messages'),msg);inp.value='';inp.style.height='';setTyp(false);
-};
-window.onTyp=el=>{
- el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px';
- setTyp(true,'text');clearTimeout(typTO);typTO=setTimeout(()=>setTyp(false),2800);
-};
+window.sendMsg=async()=>{const inp=$('msgi'),text=inp.value.trim();if(!text)return;const msg={from:me,type:'text',text,time:Date.now(),seen:false};if(replyKey){msg.replyKey=replyKey;cancelReply();}await push(R('messages'),msg);inp.value='';inp.style.height='';setTyp(false);};
+window.onTyp=el=>{el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px';setTyp(true,'text');clearTimeout(typTO);typTO=setTimeout(()=>setTyp(false),2800);};
 async function setTyp(active,kind='text'){await set(R('typing',me),active?{active:true,kind,ts:Date.now()}:{active:false});}
 
-/* ══ Stickers ══ */
 function buildStickers(){
  const g=$('sgrid');g.innerHTML='';
  STKS.forEach(s=>{
   const d=document.createElement('div');d.className='si';d.textContent=s;
-  d.onclick=()=>{
-   const inp=$('msgi');const pos=inp.selectionStart||inp.value.length;
-   inp.value=inp.value.slice(0,pos)+s+inp.value.slice(pos);
-   inp.selectionStart=inp.selectionEnd=pos+s.length;inp.focus();
-   inp.style.height='auto';inp.style.height=Math.min(inp.scrollHeight,100)+'px';
-   $('spick').classList.remove('show');
-  };
+  d.onclick=()=>{const inp=$('msgi');const pos=inp.selectionStart||inp.value.length;inp.value=inp.value.slice(0,pos)+s+inp.value.slice(pos);inp.selectionStart=inp.selectionEnd=pos+s.length;inp.focus();inp.style.height='auto';inp.style.height=Math.min(inp.scrollHeight,100)+'px';$('spick').classList.remove('show');};
   g.appendChild(d);
  });
 }
 window.togStk=e=>{e.stopPropagation();$('spick').classList.toggle('show');};
 
-/* ══ Attach ══ */
 window.togAtt=e=>{
  const m=$('amenu');m.classList.toggle('show');
- if(m.classList.contains('show')){
-  const rect=e.target.getBoundingClientRect();
-  m.style.left=Math.max(8,rect.left-10)+'px';
-  m.style.bottom=(window.innerHeight-rect.top+8)+'px';m.style.top='auto';
- }
+ if(m.classList.contains('show')){const rect=e.target.getBoundingClientRect();m.style.left=Math.max(8,rect.left-10)+'px';m.style.bottom=(window.innerHeight-rect.top+8)+'px';m.style.top='auto';}
 };
 window.trigFile=type=>{fMode=type;const fi=$('file-inp');fi.accept=type==='image'?'image/*':'video/*';fi.click();$('amenu').classList.remove('show');};
 window.handleFile=async e=>{
- const file=e.target.files[0];if(!file)return;
- setTyp(true,fMode);
+ const file=e.target.files[0];if(!file)return;setTyp(true,fMode);
  const reader=new FileReader();
  reader.onload=async ev=>{
   let url=ev.target.result;
   const msg={from:me,type:fMode,url,time:Date.now(),seen:false};
   if(replyKey){msg.replyKey=replyKey;cancelReply();}
-  const pushRef=await push(R('messages'),msg);
-  setTyp(false);
-  // Background upload
-  try{
-   const spRef=sr(sto,`media/${me}/${Date.now()}_${file.name}`);
-   await uploadString(spRef,url,'data_url');
-   const dlUrl=await getDownloadURL(spRef);
-   await update(pushRef,{url:dlUrl});
-  }catch(ex){}
+  const pushRef=await push(R('messages'),msg);setTyp(false);
+  try{const spRef=sr(sto,`media/${me}/${Date.now()}_${file.name}`);await uploadString(spRef,url,'data_url');const dlUrl=await getDownloadURL(spRef);await update(pushRef,{url:dlUrl});}catch(ex){}
  };
  reader.readAsDataURL(file);e.target.value='';
 };
 
-/* ══ Voice record ══ */
 window.togRec=async()=>{
  if(!isRec){
   try{
@@ -1362,11 +1261,9 @@ window.togRec=async()=>{
  }else{mediaRec.stop();isRec=false;$('recb').classList.remove('rec');$('recb').textContent='🎙️';setTyp(false);}
 };
 
-/* ══ Image viewer ══ */
 window.openImgV=src=>{$('imgv-img').src=decodeURIComponent(src);$('imgv').classList.add('show');};
 window.clImgV=()=>$('imgv').classList.remove('show');
 
-/* ══ Profile view ══ */
 window.openPV=()=>{
  const p=profCache[them]||{};
  $('pv-av').src=getAv(them);$('pv-name').textContent=getName(them);$('pv-nick').textContent='@'+them;
@@ -1380,20 +1277,15 @@ window.openPV=()=>{
  if(p.location)fields.push({ic:'📍',lb:'Manzil',vl:p.location});
  if(p.dob)fields.push({ic:'🎂',lb:"Tug'ilgan sana",vl:fmtDob(p.dob)});
  const fc=$('pv-fields');
- fc.innerHTML=fields.length?fields.map(f=>`<div class="pvf"><div class="pvfic">${f.ic}</div><div><div class="pvflbl">${f.lb}</div><div class="pvfval">${esc(f.vl)}</div></div></div>`).join('')
-  :`<div style="text-align:center;padding:14px;color:var(--tx3);font-size:12.5px">Profil ma'lumotlari to'ldirilmagan</div>`;
+ fc.innerHTML=fields.length?fields.map(f=>`<div class="pvf"><div class="pvfic">${f.ic}</div><div><div class="pvflbl">${f.lb}</div><div class="pvfval">${esc(f.vl)}</div></div></div>`).join(''):`<div style="text-align:center;padding:14px;color:var(--tx3);font-size:12.5px">Profil ma'lumotlari to'ldirilmagan</div>`;
  $('prof-ov').classList.add('show');
 };
 window.closePVOv=e=>{if(e.target.id==='prof-ov')$('prof-ov').classList.remove('show');};
 
-/* ══ Settings ══ */
 window.openSett=()=>{loadSettData();showPg('pg-sett');};
 window.goChat=()=>showPg('pg-chat');
 window.swTab=tab=>{
- ['pr','gn','pl'].forEach(t=>{
-  $('tab-'+t)?.classList.toggle('on',t===tab);
-  $('body-'+t).style.display=t===tab?'block':'none';
- });
+ ['pr','gn','pl'].forEach(t=>{$('tab-'+t)?.classList.toggle('on',t===tab);$('body-'+t).style.display=t===tab?'block':'none';});
  if(tab==='pl'){renderPlaylist();updMusUI();}
 };
 function loadSettData(){
@@ -1407,11 +1299,7 @@ function buildAvGrid(){
  DEF_AVS.forEach(av=>{
   const img=document.createElement('img');img.className='avo';img.src=av;
   if(getAv(me)===av)img.classList.add('sel');
-  img.onclick=async()=>{
-   document.querySelectorAll('.avo').forEach(i=>i.classList.remove('sel'));img.classList.add('sel');
-   profCache[me]={...(profCache[me]||{}),avatar:av};
-   await set(R('profiles',me),profCache[me]);$('my-av').src=av;toast('✓ Avatar yangilandi');
-  };
+  img.onclick=async()=>{document.querySelectorAll('.avo').forEach(i=>i.classList.remove('sel'));img.classList.add('sel');profCache[me]={...(profCache[me]||{}),avatar:av};await set(R('profiles',me),profCache[me]);$('my-av').src=av;toast('✓ Avatar yangilandi');};
   g.appendChild(img);
  });
 }
@@ -1430,27 +1318,14 @@ window.saveProf=async()=>{
  const p={...(profCache[me]||{}),name:$('sp-nm').value.trim()||USERS[me].defNick,bio:$('sp-bio').value.trim(),phone:$('sp-ph').value.trim(),location:$('sp-loc').value.trim(),dob:$('sp-dob').value};
  profCache[me]=p;await set(R('profiles',me),p);updHdr();toast('✓ Profil saqlandi');
 };
-
-/* Theme */
-window.togTheme=inp=>{
- isDark=inp.checked;document.body.classList.toggle('light',!isDark);
- localStorage.setItem('pc_theme',isDark?'dark':'light');
- updateBg();
- if(!playlist.length||!playlist[curTrack]?.src)useDefaultMusic();
- updMusUI();
-};
-
-/* Music */
+window.togTheme=inp=>{isDark=inp.checked;document.body.classList.toggle('light',!isDark);localStorage.setItem('pc_theme',isDark?'dark':'light');updateBg();if(!playlist.length||!playlist[curTrack]?.src)useDefaultMusic();updMusUI();};
 window.togMusic=inp=>{prefs.musicOn=inp.checked;inp.checked?auMus.play().catch(()=>{}):auMus.pause();savePrefs();updMusUI();};
 window.setMusVol=v=>{auMus.volume=v/100;prefs.musicVol=parseInt(v);const l=$('mvol-lbl');if(l)l.textContent=v+'%';savePrefs();};
 window.setNtfVol=v=>{auNtf.volume=v/100;prefs.notifVol=parseInt(v);const l=$('nvol-lbl');if(l)l.textContent=v+'%';savePrefs();};
 window.togNotif=inp=>{prefs.notifOn=inp.checked;savePrefs();};
-
-/* Password */
 window.showChPw=()=>{$('cp-cur').value='';$('cp-new').value='';$('cp-cf').value='';$('cp-err').textContent='';$('ov-chpw').classList.add('show');};
 window.savePw=async()=>{
- const cur=$('cp-cur').value,nw=$('cp-new').value,cf=$('cp-cf').value;
- $('cp-err').textContent='';
+ const cur=$('cp-cur').value,nw=$('cp-new').value,cf=$('cp-cf').value;$('cp-err').textContent='';
  const stored=(await get(R('passwords',me))).val()||USERS[me].defPass;
  if(cur!==stored){$('cp-err').textContent="❌ Joriy parol noto'g'ri";return;}
  if(!nw){$('cp-err').textContent="❌ Yangi parol bo'sh";return;}
@@ -1458,23 +1333,21 @@ window.savePw=async()=>{
  await set(R('passwords',me),nw);clOv('ov-chpw');toast('✓ Parol yangilandi');
 };
 window.clearHist=async()=>{if(!confirm("Barcha xabarlarni o'chirasizmi?"))return;await remove(R('messages'));toast('✓ Tarix tozalandi');};
-
-/* Logout */
 window.doLogout=async()=>{
  stopMusic();
  await set(R('presence',me),{online:false,last:serverTimestamp()});
  await set(R('typing',me),{active:false});
- [unsMsg,unsTyp,unsOnl,unsPrf,unsWC].forEach(u=>{if(u)u();});
- endCallLocal(true);
- me=null;them=null;playlist=[];curTrack=0;
+ [unsMsg,unsTyp,unsOnl,unsPrf,unsWC,unsICE].forEach(u=>{if(u)u();});
+ endCallLocal(false);
+ me=null;them=null;playlist=[];curTrack=0;currentCallId=null;
  $('i-lg').value='';$('i-pw').value='';$('i-kw').value='';
  $('s1').style.display='block';$('s2').style.display='none';
  $('sd1').className='sd on';$('sd2').className='sd off';
  $('bgl').style.backgroundImage='none';
  showPg('pg-login');
 };
+function stopMusic(){auMus.pause();updMusUI();}
 
-/* Init */
 (()=>{
  const th=localStorage.getItem('pc_theme');
  if(th==='light'){isDark=false;document.body.classList.add('light');}
@@ -1484,10 +1357,6 @@ window.doLogout=async()=>{
   if(me){set(R('presence',me),{online:false,last:Date.now()});set(R('typing',me),{active:false});}
  });
  setInterval(()=>{if(me)set(R('presence',me),{online:true,last:Date.now()});},20000);
- // Firebase Security Rules note:
- // You need to add these rules in Firebase Console > Realtime Database > Rules:
- // { "rules": { ".read": "auth == null || auth != null", ".write": "auth == null || auth != null" } }
- // For simplicity: { "rules": { ".read": true, ".write": true } }
 })();
 </script>
 </body>
