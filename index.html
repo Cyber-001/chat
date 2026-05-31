@@ -62,8 +62,7 @@ input,textarea,select,button{font-family:var(--f)}
 .bk b{color:var(--acc2)}
 .chat-pg{position:fixed;inset:0;z-index:2;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .3s}
 .chat-pg.act{opacity:1;pointer-events:all}
-.chat-pg.call-active .hdr{visibility:hidden;pointer-events:none}
-.hdr{background:var(--bg2);border-bottom:1px solid var(--bdr);padding:8px 13px;display:flex;align-items:center;gap:11px;flex-shrink:0;backdrop-filter:blur(20px);z-index:10;box-shadow:0 2px 16px rgba(0,0,0,.22);transition:visibility .2s}
+.hdr{background:var(--bg2);border-bottom:1px solid var(--bdr);padding:8px 13px;display:flex;align-items:center;gap:11px;flex-shrink:0;backdrop-filter:blur(20px);z-index:10;box-shadow:0 2px 16px rgba(0,0,0,.22)}
 .hav{width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid var(--acc);cursor:pointer;flex-shrink:0;transition:transform .2s}
 .hav:hover{transform:scale(1.07)}
 .hinfo{flex:1;min-width:0;cursor:pointer}
@@ -241,31 +240,10 @@ input,textarea,select,button{font-family:var(--f)}
 .pl-del{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:15px;padding:4px 6px;border-radius:6px;transition:color .15s;flex-shrink:0}
 .pl-del:hover{color:var(--red)}
 .pl-empty{text-align:center;padding:24px;color:var(--tx3);font-size:12.5px;background:var(--bg2);border-radius:13px;border:1px solid var(--bdr)}
-
 /* ══ CALL OVERLAY ══ */
-.call-ov{
-  position:fixed;inset:0;background:rgba(8,8,15,.97);z-index:400;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:14px;backdrop-filter:blur(24px);padding-bottom:env(safe-area-inset-bottom);
-  opacity:0;pointer-events:none;
-  transition:opacity .4s cubic-bezier(.4,0,.2,1);
-  will-change:opacity;
-}
-.call-ov.show{opacity:1;pointer-events:all}
-
-/* c-inc: incoming/outgoing ring screen */
-.c-inc{
-  display:flex;flex-direction:column;align-items:center;gap:13px;
-  transition:opacity .3s ease, transform .3s ease;
-  will-change:opacity,transform;
-}
-/* fade-out state before switching to active call */
-.c-inc.fade-out{
-  opacity:0;
-  transform:scale(.92) translateY(-12px);
-  pointer-events:none;
-}
-
+.call-ov{position:fixed;inset:0;background:rgba(8,8,15,.95);z-index:400;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;backdrop-filter:blur(16px);padding-bottom:env(safe-area-inset-bottom)}
+.call-ov.show{display:flex}
+.c-inc{display:flex;flex-direction:column;align-items:center;gap:13px;animation:pop .3s ease}
 .c-rings{position:relative;display:flex;align-items:center;justify-content:center;margin-bottom:4px}
 .cring{position:absolute;width:108px;height:108px;border-radius:50%;border:2px solid rgba(108,99,255,.3);animation:cring 2s ease-out infinite}
 .cring:nth-child(2){animation-delay:.5s}.cring:nth-child(3){animation-delay:1s}
@@ -277,35 +255,15 @@ input,textarea,select,button{font-family:var(--f)}
 .c-inc-btns{display:flex;gap:28px;margin-top:10px}
 .cbig{width:68px;height:68px;border-radius:50%;border:none;cursor:pointer;font-size:26px;display:flex;align-items:center;justify-content:center;transition:all .22s;position:relative}
 .cbig:hover{transform:scale(1.1)}
-.cbig.acc{background:var(--grn);box-shadow:0 4px 22px rgba(45,212,160,.45);animation:accPulse 1.8s ease infinite}
-@keyframes accPulse{0%,100%{box-shadow:0 4px 22px rgba(45,212,160,.45)}50%{box-shadow:0 4px 30px rgba(45,212,160,.75),0 0 0 8px rgba(45,212,160,.15)}}
+.cbig.acc{background:var(--grn);box-shadow:0 4px 22px rgba(45,212,160,.45)}
 .cbig.dec{background:var(--red);box-shadow:0 4px 22px rgba(255,95,122,.45)}
 .cbig-lbl{position:absolute;bottom:-20px;font-size:10.5px;font-weight:700;color:var(--tx2);white-space:nowrap;left:50%;transform:translateX(-50%)}
-
-/* c-act: active call screen — always in DOM, shown via opacity+transform */
-.c-act{
-  display:flex;flex-direction:column;align-items:center;gap:13px;width:100%;
-  opacity:0;
-  transform:translateY(20px) scale(.96);
-  pointer-events:none;
-  transition:opacity .35s cubic-bezier(.34,1.2,.64,1), transform .35s cubic-bezier(.34,1.2,.64,1);
-  will-change:opacity,transform;
-  /* hidden by default but always in layout flow — avoids display:none flash */
-  position:absolute;
-}
-.c-act.show{
-  opacity:1;
-  transform:none;
-  pointer-events:all;
-  position:relative;
-}
-
+.c-act{display:none;flex-direction:column;align-items:center;gap:13px;width:100%}
+.c-act.show{display:flex}
 .c-act .cav{width:86px;height:86px}
-.ctm{font-family:var(--mono);font-size:28px;font-weight:700;color:var(--acc2);letter-spacing:3px;
-  text-shadow:0 0 20px rgba(108,99,255,.4)}
+.ctm{font-family:var(--mono);font-size:24px;color:var(--acc2);letter-spacing:2px}
 .cst{color:var(--tx3);font-size:13px;font-weight:500}
-.vid-area{display:none;position:relative;border-radius:18px;overflow:hidden;width:min(360px,90vw);background:#000;margin-top:6px;
-  box-shadow:0 8px 40px rgba(0,0,0,.6)}
+.vid-area{display:none;position:relative;border-radius:18px;overflow:hidden;width:min(360px,90vw);background:#000;margin-top:6px}
 .vid-area.show{display:block}
 .vid-remote{width:100%;height:min(240px,50vw);object-fit:cover;display:block;background:#111}
 .vid-local-wrap{position:absolute;bottom:10px;right:10px;width:90px;height:130px;border-radius:12px;overflow:hidden;border:2px solid rgba(255,255,255,.3);background:#222;box-shadow:0 4px 16px rgba(0,0,0,.5)}
@@ -322,29 +280,23 @@ input,textarea,select,button{font-family:var(--f)}
 .imgv-cl{position:absolute;top:14px;right:14px;background:rgba(0,0,0,.4);border:none;color:#fff;width:40px;height:40px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--bg2);border:1px solid var(--bdr2);border-radius:11px;padding:8px 18px;font-size:12.5px;font-weight:600;z-index:600;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.4);backdrop-filter:blur(12px);white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* ── DEBUG PANEL: opacity-based hide, auto-fades ── */
-.dbg{
-  position:fixed;top:60px;right:8px;
-  background:rgba(0,0,0,.85);color:#0f0;
-  font-family:monospace;font-size:10px;
-  padding:6px 10px;border-radius:8px;z-index:999;
-  max-width:220px;line-height:1.6;pointer-events:none;
-  opacity:0;
-  transform:translateX(8px);
-  transition:opacity .3s ease, transform .3s ease;
-  /* always in DOM — no display toggle needed */
-}
-.dbg.show{opacity:1;transform:none}
-
+/* Hide header online indicator during active call */
+body.in-call .hdr{opacity:0;pointer-events:none;transition:opacity .3s}
+/* Smooth call overlay */
+.call-ov{transition:opacity .35s cubic-bezier(.4,0,.2,1)}
+.call-ov:not(.show){opacity:0!important;pointer-events:none}
+.call-ov.show{opacity:1}
+/* Smooth panel transitions */
+.c-inc{transition:opacity .25s,transform .25s}
+.c-act{transition:opacity .25s,transform .25s}
+.c-act.show{animation:fadeUp .28s cubic-bezier(.34,1.1,.64,1)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 @media(max-width:600px){.acard{padding:24px 16px}.mbbl{max-width:85%}.mbox{padding:18px 14px}.pvbody{padding:54px 16px 20px}.sp-body{padding:10px}.vsl{width:85px}}
 @media(max-width:360px){.sgrid{grid-template-columns:repeat(4,1fr)}}
 </style>
 </head>
 <body>
 <div class="bgl" id="bgl"></div>
-<!-- debug panel: always present, hidden via opacity -->
-<div class="dbg" id="dbg"></div>
 
 <!-- LOADER -->
 <div class="pg ldr act" id="pg-ldr">
@@ -500,7 +452,7 @@ input,textarea,select,button{font-family:var(--f)}
             <span style="color:var(--tx3)">›</span>
           </div>
         </div>
-        <div style="text-align:center;margin-top:14px;color:var(--tx3);font-size:11.5px;font-family:var(--mono)">PrivateChat v5.2 · Only2</div>
+        <div style="text-align:center;margin-top:14px;color:var(--tx3);font-size:11.5px;font-family:var(--mono)">PrivateChat v5.1 · Only2</div>
       </div>
       <div id="body-pl" style="display:none">
         <div class="pl-now">
@@ -604,7 +556,7 @@ input,textarea,select,button{font-family:var(--f)}
 
 <!-- ══ CALL OVERLAY ══ -->
 <div class="call-ov" id="call-ov">
-  <!-- incoming / outgoing ring screen -->
+  <!-- Kiruvchi / Chiquvchi ekran -->
   <div class="c-inc" id="c-inc">
     <div class="c-rings">
       <div class="cring"></div><div class="cring"></div><div class="cring"></div>
@@ -613,6 +565,7 @@ input,textarea,select,button{font-family:var(--f)}
     <div class="cnm" id="cnm-inc"></div>
     <div class="ctype" id="ctype-lbl">AUDIO QO'NG'IROQ</div>
     <div class="csub" id="csub-lbl">Qo'ng'iroq qilmoqda...</div>
+    <!-- Kiruvchi tugmalar -->
     <div class="c-inc-btns" id="c-inc-btns" style="display:none">
       <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:24px">
         <button class="cbig dec" onclick="declineCall()">📵</button>
@@ -623,13 +576,14 @@ input,textarea,select,button{font-family:var(--f)}
         <span style="font-size:10.5px;font-weight:700;color:var(--tx2)">Qabul qilish</span>
       </div>
     </div>
+    <!-- Chiquvchi bekor qilish -->
     <div id="c-out-btns" style="display:none;flex-direction:column;align-items:center;gap:8px;margin-top:10px">
       <button class="cbig dec" onclick="cancelOutgoing()">📵</button>
       <span style="font-size:11px;color:var(--tx3)">Bekor qilish</span>
     </div>
   </div>
 
-  <!-- active call screen — always in DOM, shown via CSS transition -->
+  <!-- Faol qo'ng'iroq ekrani -->
   <div class="c-act" id="c-act">
     <img class="cav" id="cav-act" src="" alt="">
     <div class="cnm" id="cnm-act"></div>
@@ -695,14 +649,30 @@ let ctxKey=null,replyKey=null;
 let isRec=false,mediaRec=null,audChunks=[];
 let typTO=null,fMode=null;
 let callTim=null,callSecs=0,isMuted=false,isCamOff=false,isSpkOff=false,isVid=false;
-let callState='idle';
+let callState='idle'; // idle | ringing_out | ringing_in | active
 let profCache={},prefs={},isDark=true,themOnline=false,msgCache={};
 let unsMsg=null,unsTyp=null,unsOnl=null,unsPrf=null,unsWC=null;
 
-/* ══ WebRTC ══ */
-let pc=null,localStream=null,currentCallId=null;
-let pendingCandidates=[];
+/* ══ WebRTC ══
+   TUZATILGAN ARXITEKTURA:
+   
+   Firebase yo'llari:
+     webrtc/calls/<callId>/offer   — caller yozadi
+     webrtc/calls/<callId>/answer  — callee yozadi
+     webrtc/calls/<callId>/ice/<uid>/<pushKey>  — ICE kandidatlar (overwrite bo'lmaydi!)
+     webrtc/calls/<callId>/state   — 'ringing'|'active'|'ended'
+   
+   callId = caller_uid + '_' + callee_uid (har doim kichik tartibda)
+   
+   Bu arxitektura ICE kandidatlarni list sifatida saqlaydi,
+   overwrite muammosini butunlay hal qiladi.
+══ */
 
+let pc=null,localStream=null,currentCallId=null;
+let pendingCandidates=[]; // remote description kelgunga qadar saqlash
+
+// ICE config: STUN + bepul TURN serverlar (har xil tarmoq uchun zarur)
+// open-relay.metered.ca — bepul, ishonchli TURN relay
 const ICE_CFG={
  iceServers:[
   {urls:'stun:stun.l.google.com:19302'},
@@ -710,8 +680,11 @@ const ICE_CFG={
   {urls:'stun:stun2.l.google.com:19302'},
   {urls:'stun:stun3.l.google.com:19302'},
   {urls:'stun:stun4.l.google.com:19302'},
-  {urls:'stun:global.stun.twilio.com:3478'},
-  {urls:'stun:stun.cloudflare.com:3478'},
+  // Metered bepul TURN
+  {urls:'turn:a.relay.metered.ca:80',username:'openrelayproject',credential:'openrelayproject'},
+  {urls:'turn:a.relay.metered.ca:80?transport=tcp',username:'openrelayproject',credential:'openrelayproject'},
+  {urls:'turn:a.relay.metered.ca:443',username:'openrelayproject',credential:'openrelayproject'},
+  {urls:'turn:a.relay.metered.ca:443?transport=tcp',username:'openrelayproject',credential:'openrelayproject'},
  ],
  iceCandidatePoolSize:10,
  bundlePolicy:'max-bundle',
@@ -721,28 +694,7 @@ const ICE_CFG={
 function getCallId(a,b){return[a,b].sort().join('_');}
 function callRef(...p){return R('webrtc','calls',currentCallId,...p);}
 
-/* ── Debug: auto-hide after 5s ── */
-let _dbgTimer=null;
-function dbg(msg){
- const el=$('dbg');if(!el)return;
- console.log('[WebRTC]',msg);
- el.innerHTML=(el.innerHTML+'\n'+msg).split('\n').slice(-8).join('\n');
- el.classList.add('show');
- clearTimeout(_dbgTimer);
- _dbgTimer=setTimeout(()=>{
-  el.classList.remove('show');
-  // clear text after fade-out completes
-  setTimeout(()=>{if(!el.classList.contains('show'))el.innerHTML='';},350);
- },5000);
-}
-
-function setCallActive(active){
- const chatPg=$('pg-chat');
- if(chatPg){
-  if(active)chatPg.classList.add('call-active');
-  else chatPg.classList.remove('call-active');
- }
-}
+function dbg(msg){console.log('[WebRTC]',msg);}
 
 async function createPC(){
  if(pc){try{pc.close();}catch(e){}pc=null;}
@@ -750,32 +702,51 @@ async function createPC(){
  pc=new RTCPeerConnection(ICE_CFG);
  dbg('PC yaratildi');
 
+ // ICE kandidatlarni Firebase'ga yuborish (push — overwrite yo'q!)
  pc.onicecandidate=({candidate})=>{
   if(!candidate||!currentCallId)return;
   push(callRef('ice',me),candidate.toJSON()).catch(e=>dbg('ICE yuborish xato:'+e));
-  dbg('ICE yuborildi');
+  dbg('ICE yuborildi: '+candidate.type);
+ };
+
+ // ICE gathering tugadi
+ pc.onicegatheringstatechange=()=>{
+  dbg('ICE gathering: '+pc?.iceGatheringState);
  };
 
  pc.oniceconnectionstatechange=()=>{
   dbg('ICE holat: '+pc?.iceConnectionState);
-  if(pc&&pc.iceConnectionState==='connected'){
+  if(pc&&(pc.iceConnectionState==='connected'||pc.iceConnectionState==='completed')){
    dbg('✅ P2P ulandi!');
    if(callState==='active'){$('c-st').textContent=isVid?"Video qo'ng'iroq":"Audio qo'ng'iroq";}
   }
+  // ICE failed bo'lsa restart qilishga urinish
   if(pc&&pc.iceConnectionState==='failed'){
-   dbg('ICE failed — restart...');
-   pc.restartIce();
+   dbg('ICE failed — restartICE');
+   try{pc.restartIce();}catch(e){
+    toast("📵 Ulanish muvaffaqiyatsiz");
+    endCallLocal(true);
+   }
+  }
+  if(pc&&pc.iceConnectionState==='disconnected'){
+   // 5 soniya kutib, agar reconnect bo'lmasa tugatish
+   setTimeout(()=>{
+    if(pc&&pc.iceConnectionState==='disconnected'){
+     toast("📵 Ulanish uzildi");endCallLocal(true);
+    }
+   },5000);
   }
  };
 
  pc.onconnectionstatechange=()=>{
   dbg('PC holat: '+pc?.connectionState);
-  if(pc&&(pc.connectionState==='failed'||pc.connectionState==='disconnected')){
+  if(pc&&pc.connectionState==='failed'){
    toast("📵 Ulanish uzildi");
    endCallLocal(true);
   }
  };
 
+ // Remote track qabul qilish
  pc.ontrack=({track,streams})=>{
   dbg('Remote track: '+track.kind);
   const rv=$('vid-remote');
@@ -787,6 +758,7 @@ async function createPC(){
  return pc;
 }
 
+// Remote description o'rnatilgandan keyin pending ICE larni qo'shish
 async function flushPendingCandidates(){
  dbg('Pending ICE flush: '+pendingCandidates.length);
  for(const c of pendingCandidates){
@@ -796,13 +768,19 @@ async function flushPendingCandidates(){
  pendingCandidates=[];
 }
 
+// Qarshi tomon ICE kandidatlarini kuzatish
 let unsICE=null;
+const seenICE=new Set(); // takroriy ICE larni oldini olish
 function subICE(){
  if(unsICE){unsICE();unsICE=null;}
+ seenICE.clear();
  if(!currentCallId)return;
  unsICE=onValue(callRef('ice',them),async snap=>{
   if(!snap.exists()||!pc)return;
   snap.forEach(child=>{
+   const key=child.key;
+   if(seenICE.has(key))return; // allaqachon qo'shilgan
+   seenICE.add(key);
    const c=child.val();
    if(!c)return;
    if(pc.remoteDescription){
@@ -822,10 +800,12 @@ async function initiateCall(){
  currentCallId=getCallId(me,them);
  dbg('Chiquvchi: '+currentCallId+' vid='+isVid);
 
+ // Eski qo'ng'iroq nodini tozalash
+ try{await remove(callRef());}catch(e){}
+
+ // Media olish
  try{
-  const c=isVid
-   ?{video:{width:{ideal:1280},height:{ideal:720},facingMode:'user',frameRate:{ideal:30}},audio:{echoCancellation:true,noiseSuppression:true,sampleRate:48000}}
-   :{audio:{echoCancellation:true,noiseSuppression:true,sampleRate:48000},video:false};
+  const c=isVid?{video:{width:{ideal:640},height:{ideal:480},facingMode:'user'},audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}}:{audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false};
   localStream=await navigator.mediaDevices.getUserMedia(c);
   dbg('Media olindi');
  }catch(e){
@@ -840,12 +820,15 @@ async function initiateCall(){
  if(isVid){$('vid-local').srcObject=localStream;$('vid-local').play().catch(()=>{});$('cb-cam').style.display='flex';}
  else{$('cb-cam').style.display='none';}
 
+ // ICE tinglashni boshlash
  subICE();
 
- const offer=await pc.createOffer({offerToReceiveAudio:true,offerToReceiveVideo:isVid});
+ // Offer yaratish (TURN ham kiritilgan holda)
+ const offer=await pc.createOffer({offerToReceiveAudio:true,offerToReceiveVideo:isVid,iceRestart:true});
  await pc.setLocalDescription(offer);
  dbg('Offer yaratildi');
 
+ // Firebase'ga offer yozish + holat
  await set(callRef(),{
   offer:{type:offer.type,sdp:offer.sdp},
   isVideo:isVid,
@@ -858,13 +841,15 @@ async function initiateCall(){
 
  callState='ringing_out';
  showRingUI(true,them,isVid);
- auRng.currentTime=0;
  auRng.play().catch(()=>{});
 }
 
 /* ══ Kiruvchi qo'ng'iroq ══ */
 function subWebRTC(){
  if(unsWC)unsWC();
+ // Bizga kelgan qo'ng'iroqlarni kuzatish
+ // callId da biz ham caller ham callee bo'lishimiz mumkin
+ // Shuning uchun barcha qo'ng'iroqlarni tekshiramiz
  unsWC=onValue(R('webrtc','calls'),async snap=>{
   if(!snap.exists())return;
   snap.forEach(child=>{
@@ -872,6 +857,7 @@ function subWebRTC(){
    const v=child.val();
    if(!v)return;
 
+   // Bizga kelgan qo'ng'iroq (biz callee)
    if(v.callee===me&&v.state==='ringing'&&callState==='idle'){
     dbg('Kiruvchi qo\'ng\'iroq: '+callId);
     currentCallId=callId;
@@ -879,10 +865,10 @@ function subWebRTC(){
     callState='ringing_in';
     window._incomingData=v;
     showRingUI(false,v.caller||them,isVid);
-    auRng.currentTime=0;
     auRng.play().catch(()=>{});
    }
 
+   // Answer keldi (biz caller)
    if(v.caller===me&&v.state==='ringing'&&v.answer&&pc&&callState==='ringing_out'){
     dbg('Answer qabul qilindi');
     if(!pc.remoteDescription){
@@ -900,6 +886,7 @@ function subWebRTC(){
     }
    }
 
+   // Qo'ng'iroq tugadi
    if((v.caller===me||v.callee===me)&&v.state==='ended'&&callState!=='idle'){
     dbg('Qo\'ng\'iroq tugadi (remote)');
     if(callState==='active')toast("📵 Qo'ng'iroq tugadi");
@@ -909,20 +896,7 @@ function subWebRTC(){
  });
 }
 
-/* ── showRingUI: prepare ring/incoming screen cleanly ── */
 function showRingUI(isOutgoing,fromUid,video){
- // Reset c-act to hidden state without transition (instant)
- const act=$('c-act');
- act.style.transition='none';
- act.classList.remove('show');
- void act.offsetWidth; // force reflow so transition disabling takes effect
- act.style.transition='';
-
- // Reset c-inc to visible, no fade-out
- const inc=$('c-inc');
- inc.classList.remove('fade-out');
- inc.style.display='flex';
-
  $('cav-inc').src=getAv(fromUid);
  $('cnm-inc').textContent=getName(fromUid);
  $('ctype-lbl').textContent=video?"VIDEO QO'NG'IROQ":"AUDIO QO'NG'IROQ";
@@ -930,24 +904,21 @@ function showRingUI(isOutgoing,fromUid,video){
  $('c-inc-btns').style.display=isOutgoing?'none':'flex';
  $('c-out-btns').style.display=isOutgoing?'flex':'none';
  $('acc-btn').textContent=video?'📹':'📞';
-
+ $('c-inc').style.display='flex';
+ $('c-act').classList.remove('show');
  $('call-ov').classList.add('show');
- setCallActive(true);
+ document.body.classList.add('in-call');
 }
 
 /* ══ Qabul qilish ══ */
 window.acceptCall=async()=>{
- auRng.pause();
- auRng.currentTime=0;
-
+ auRng.pause();auRng.currentTime=0;
  const v=window._incomingData;
  if(!v||!v.offer){endCallLocal(false);return;}
  dbg('Qabul qilinmoqda...');
 
  try{
-  const c=isVid
-   ?{video:{width:{ideal:1280},height:{ideal:720},facingMode:'user',frameRate:{ideal:30}},audio:{echoCancellation:true,noiseSuppression:true,sampleRate:48000}}
-   :{audio:{echoCancellation:true,noiseSuppression:true,sampleRate:48000},video:false};
+  const c=isVid?{video:{width:{ideal:640},height:{ideal:480},facingMode:'user'},audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}}:{audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false};
   localStream=await navigator.mediaDevices.getUserMedia(c);
  }catch(e){
   toast("❌ Ruxsat yo'q: "+e.message);endCallLocal(false);return;
@@ -959,16 +930,20 @@ window.acceptCall=async()=>{
  if(isVid){$('vid-local').srcObject=localStream;$('vid-local').play().catch(()=>{});$('cb-cam').style.display='flex';}
  else{$('cb-cam').style.display='none';}
 
+ // ICE tinglashni boshlash (caller ning ICE larini)
  subICE();
 
+ // Offer o'rnatish
  await pc.setRemoteDescription(new RTCSessionDescription(v.offer));
  dbg('Remote desc o\'rnatildi (offer)');
  await flushPendingCandidates();
 
+ // Answer yaratish
  const answer=await pc.createAnswer();
  await pc.setLocalDescription(answer);
  dbg('Answer yaratildi');
 
+ // Firebase'ga answer yozish
  await update(callRef(),{
   answer:{type:answer.type,sdp:answer.sdp},
   state:'ringing'
@@ -981,30 +956,25 @@ window.acceptCall=async()=>{
 };
 
 window.declineCall=async()=>{
- auRng.pause();
- auRng.currentTime=0;
+ auRng.pause();auRng.currentTime=0;
  if(currentCallId)await update(callRef(),{state:'ended'}).catch(()=>{});
  callState='idle';window._incomingData=null;
+ document.body.classList.remove('in-call');
  $('call-ov').classList.remove('show');
- setCallActive(false);
  setTimeout(()=>{if(currentCallId)remove(callRef()).catch(()=>{});currentCallId=null;},2000);
 };
 
 window.cancelOutgoing=async()=>{
- auRng.pause();
- auRng.currentTime=0;
+ auRng.pause();auRng.currentTime=0;
  dbg('Chiquvchi bekor qilindi');
  if(currentCallId)await update(callRef(),{state:'ended'}).catch(()=>{});
  endCallLocal(false);
  setTimeout(()=>{if(currentCallId)remove(callRef()).catch(()=>{});currentCallId=null;},2000);
 };
 
-/* ── activateCallUI: smooth fade ring-screen → active-screen ── */
 function activateCallUI(){
- auRng.pause();
- auRng.currentTime=0;
-
- // Prepare active panel content before animating in
+ $('c-inc').style.display='none';
+ $('c-act').classList.add('show');
  $('cav-act').src=getAv(them);
  $('cnm-act').textContent=getName(them);
  $('c-st').textContent=isVid?"Video qo'ng'iroq":"Audio qo'ng'iroq";
@@ -1015,17 +985,6 @@ function activateCallUI(){
  isMuted=false;isCamOff=false;isSpkOff=false;
  $('cb-mut').classList.remove('act');$('cb-cam').classList.remove('act');$('cb-spk').classList.remove('act');
  $('cb-mut').textContent='🎤';$('cb-cam').textContent='📷';$('cb-spk').textContent='🔊';
-
- // Step 1: fade out ring screen
- const inc=$('c-inc');
- inc.classList.add('fade-out');
-
- // Step 2: after fade-out completes, hide ring screen and reveal active panel
- setTimeout(()=>{
-  inc.style.display='none';
-  $('c-act').classList.add('show');
- },300); // matches .c-inc transition duration
-
  dbg('✅ Qo\'ng\'iroq faollashdi');
 }
 
@@ -1040,36 +999,20 @@ window.endCall=async()=>{
 
 function endCallLocal(cleanupNode){
  clearInterval(callTim);
- auRng.pause();
- auRng.currentTime=0;
+ auRng.pause();auRng.currentTime=0;
  if(unsICE){unsICE();unsICE=null;}
+ seenICE.clear();
  if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null;}
  const rv=$('vid-remote'),lv=$('vid-local');
  if(rv?.srcObject){try{rv.srcObject.getTracks().forEach(t=>t.stop());}catch(e){}rv.srcObject=null;}
  if(lv?.srcObject)lv.srcObject=null;
  if(pc){try{pc.close();}catch(e){}pc=null;}
-
- // Fade out overlay
  $('call-ov').classList.remove('show');
- setCallActive(false);
-
- // Reset both panels cleanly after overlay fades (400ms)
- setTimeout(()=>{
-  const inc=$('c-inc');
-  inc.classList.remove('fade-out');
-  inc.style.display='flex';
-
-  // Reset c-act instantly (no transition while hidden)
-  const act=$('c-act');
-  act.style.transition='none';
-  act.classList.remove('show');
-  void act.offsetWidth;
-  act.style.transition='';
-
-  $('c-inc-btns').style.display='none';
-  $('c-out-btns').style.display='none';
- },450);
-
+ document.body.classList.remove('in-call');
+ $('c-inc').style.display='flex';
+ $('c-act').classList.remove('show');
+ $('c-inc-btns').style.display='none';
+ $('c-out-btns').style.display='none';
  callState='idle';
  window._incomingData=null;
  pendingCandidates=[];
