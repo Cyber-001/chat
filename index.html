@@ -692,7 +692,10 @@ const ICE_CFG={
 };
 
 function getCallId(a,b){return[a,b].sort().join('_');}
-function callRef(...p){return R('webrtc','calls',currentCallId,...p);}
+function callRef(...p){
+ if(!currentCallId)throw new Error('callId yo\'q');
+ return R('webrtc','calls',currentCallId,...p);
+}
 
 function dbg(msg){console.log('[WebRTC]',msg);}
 
@@ -770,23 +773,26 @@ async function flushPendingCandidates(){
 
 // Qarshi tomon ICE kandidatlarini kuzatish
 let unsICE=null;
-const seenICE=new Set(); // takroriy ICE larni oldini olish
+const seenICE=new Set();
 function subICE(){
  if(unsICE){unsICE();unsICE=null;}
  seenICE.clear();
  if(!currentCallId)return;
- unsICE=onValue(callRef('ice',them),async snap=>{
+ dbg('ICE tinglash boshlandi: '+them);
+ unsICE=onValue(callRef('ice',them), snap=>{
   if(!snap.exists()||!pc)return;
   snap.forEach(child=>{
    const key=child.key;
-   if(seenICE.has(key))return; // allaqachon qo'shilgan
+   if(seenICE.has(key))return;
    seenICE.add(key);
    const c=child.val();
-   if(!c)return;
+   if(!c||!c.candidate)return;
+   const ice=new RTCIceCandidate(c);
    if(pc.remoteDescription){
-    pc.addIceCandidate(new RTCIceCandidate(c)).catch(e=>dbg('ICE add xato:'+e));
+    pc.addIceCandidate(ice).then(()=>dbg('ICE qo\'shildi: '+c.candidate.split(' ')[7])).catch(e=>dbg('ICE add xato:'+e));
    }else{
     pendingCandidates.push(c);
+    dbg('ICE pending: '+pendingCandidates.length);
    }
   });
  });
@@ -844,55 +850,61 @@ async function initiateCall(){
  auRng.play().catch(()=>{});
 }
 
-/* ══ Kiruvchi qo'ng'iroq ══ */
+/* ══ Kiruvchi qo'ng'iroq ══
+   subWebRTC uchta alohida listener ishlatadi:
+   1. Incoming call listener  — callee ning nodini kuzatadi
+   2. Answer listener         — caller answer ni kutadi
+   3. State listener          — ended ni kuzatadi
+══ */
+let unsWC_inc=null, unsWC_ans=null, unsWC_end=null;
+
 function subWebRTC(){
+ // Eski listenerlarni o'chirish
  if(unsWC)unsWC();
- // Bizga kelgan qo'ng'iroqlarni kuzatish
- // callId da biz ham caller ham callee bo'lishimiz mumkin
- // Shuning uchun barcha qo'ng'iroqlarni tekshiramiz
- unsWC=onValue(R('webrtc','calls'),async snap=>{
-  if(!snap.exists())return;
-  snap.forEach(child=>{
-   const callId=child.key;
-   const v=child.val();
-   if(!v)return;
+ if(unsWC_inc){unsWC_inc();unsWC_inc=null;}
+ if(unsWC_ans){unsWC_ans();unsWC_ans=null;}
+ if(unsWC_end){unsWC_end();unsWC_end=null;}
 
-   // Bizga kelgan qo'ng'iroq (biz callee)
-   if(v.callee===me&&v.state==='ringing'&&callState==='idle'){
-    dbg('Kiruvchi qo\'ng\'iroq: '+callId);
-    currentCallId=callId;
-    isVid=v.isVideo||false;
-    callState='ringing_in';
-    window._incomingData=v;
-    showRingUI(false,v.caller||them,isVid);
-    auRng.play().catch(()=>{});
-   }
+ // ── 1. Kiruvchi qo'ng'iroqni kuzatish ──
+ // callId = [me, them].sort() shuning uchun ikkalasi ham bir xil callId ga yozadi
+ // Biz faqat bizga kelganlarni qabul qilamiz
+ const myCallId = getCallId(me, them);
+ const callNode = R('webrtc','calls', myCallId);
 
-   // Answer keldi (biz caller)
-   if(v.caller===me&&v.state==='ringing'&&v.answer&&pc&&callState==='ringing_out'){
-    dbg('Answer qabul qilindi');
-    if(!pc.remoteDescription){
-     pc.setRemoteDescription(new RTCSessionDescription(v.answer))
-      .then(()=>{
-       dbg('Remote desc o\'rnatildi (answer)');
-       return flushPendingCandidates();
-      })
-      .then(()=>{
-       callState='active';
-       update(callRef(),{state:'active'});
-       activateCallUI();
-      })
-      .catch(e=>dbg('setRemoteDesc xato:'+e));
-    }
-   }
+ unsWC_inc = onValue(callNode, async snap => {
+  const v = snap.val();
+  if(!v) return;
 
-   // Qo'ng'iroq tugadi
-   if((v.caller===me||v.callee===me)&&v.state==='ended'&&callState!=='idle'){
-    dbg('Qo\'ng\'iroq tugadi (remote)');
-    if(callState==='active')toast("📵 Qo'ng'iroq tugadi");
-    endCallLocal(false);
-   }
-  });
+  // ── Kiruvchi: biz callee, state ringing, offer bor ──
+  if(v.callee === me && v.state === 'ringing' && v.offer && callState === 'idle'){
+   dbg('📲 Kiruvchi qo\'ng\'iroq');
+   currentCallId = myCallId;
+   isVid = v.isVideo || false;
+   callState = 'ringing_in';
+   window._incomingData = v;
+   showRingUI(false, v.caller || them, isVid);
+   auRng.play().catch(()=>{});
+  }
+
+  // ── Answer keldi: biz caller, answer paydo bo'ldi ──
+  if(v.caller === me && v.answer && pc && callState === 'ringing_out' && !pc.remoteDescription){
+   dbg('📨 Answer qabul qilindi');
+   try{
+    await pc.setRemoteDescription(new RTCSessionDescription(v.answer));
+    dbg('✅ Remote desc o\'rnatildi');
+    await flushPendingCandidates();
+    callState = 'active';
+    await update(callNode, {state:'active'});
+    activateCallUI();
+   }catch(e){dbg('❌ setRemoteDesc xato: '+e);}
+  }
+
+  // ── Qo'ng'iroq tugadi ──
+  if((v.caller === me || v.callee === me) && v.state === 'ended' && callState !== 'idle'){
+   dbg('📵 Qo\'ng\'iroq tugadi (remote)');
+   if(callState === 'active') toast("📵 Qo'ng'iroq tugadi");
+   endCallLocal(false);
+  }
  });
 }
 
@@ -914,11 +926,14 @@ function showRingUI(isOutgoing,fromUid,video){
 window.acceptCall=async()=>{
  auRng.pause();auRng.currentTime=0;
  const v=window._incomingData;
- if(!v||!v.offer){endCallLocal(false);return;}
- dbg('Qabul qilinmoqda...');
+ const cid=currentCallId;
+ if(!v||!v.offer||!cid){endCallLocal(false);return;}
+ dbg('Qabul qilinmoqda... cid='+cid);
 
  try{
-  const c=isVid?{video:{width:{ideal:640},height:{ideal:480},facingMode:'user'},audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}}:{audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false};
+  const c=isVid
+   ?{video:{width:{ideal:640},height:{ideal:480},facingMode:'user'},audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}}
+   :{audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false};
   localStream=await navigator.mediaDevices.getUserMedia(c);
  }catch(e){
   toast("❌ Ruxsat yo'q: "+e.message);endCallLocal(false);return;
@@ -943,8 +958,8 @@ window.acceptCall=async()=>{
  await pc.setLocalDescription(answer);
  dbg('Answer yaratildi');
 
- // Firebase'ga answer yozish
- await update(callRef(),{
+ // Firebase'ga answer yozish — direct ref, callRef() emas
+ await update(R('webrtc','calls',cid),{
   answer:{type:answer.type,sdp:answer.sdp},
   state:'ringing'
  });
@@ -957,19 +972,22 @@ window.acceptCall=async()=>{
 
 window.declineCall=async()=>{
  auRng.pause();auRng.currentTime=0;
- if(currentCallId)await update(callRef(),{state:'ended'}).catch(()=>{});
- callState='idle';window._incomingData=null;
+ const cid=currentCallId;
+ try{if(cid)await update(R('webrtc','calls',cid),{state:'ended'});}catch(e){}
+ callState='idle';window._incomingData=null;currentCallId=null;
  document.body.classList.remove('in-call');
  $('call-ov').classList.remove('show');
- setTimeout(()=>{if(currentCallId)remove(callRef()).catch(()=>{});currentCallId=null;},2000);
+ setTimeout(()=>{if(cid)remove(R('webrtc','calls',cid)).catch(()=>{});},2000);
+ if(me&&them)subWebRTC();
 };
 
 window.cancelOutgoing=async()=>{
  auRng.pause();auRng.currentTime=0;
+ const cid=currentCallId;
  dbg('Chiquvchi bekor qilindi');
- if(currentCallId)await update(callRef(),{state:'ended'}).catch(()=>{});
+ try{if(cid)await update(R('webrtc','calls',cid),{state:'ended'});}catch(e){}
  endCallLocal(false);
- setTimeout(()=>{if(currentCallId)remove(callRef()).catch(()=>{});currentCallId=null;},2000);
+ setTimeout(()=>{if(cid)remove(R('webrtc','calls',cid)).catch(()=>{});},2000);
 };
 
 function activateCallUI(){
@@ -990,17 +1008,19 @@ function activateCallUI(){
 
 window.endCall=async()=>{
  dbg('Qo\'ng\'iroq tugatilmoqda');
- if(currentCallId)await update(callRef(),{state:'ended'}).catch(()=>{});
+ const cid=currentCallId;
+ try{if(cid)await update(R('webrtc','calls',cid),{state:'ended'});}catch(e){}
  const dur=callSecs>0?' ('+String(Math.floor(callSecs/60)).padStart(2,'0')+':'+String(callSecs%60).padStart(2,'0')+')':'';
  await push(R('messages'),{from:me,type:'text',text:(isVid?"📹 Video":"📞 Audio")+" qo'ng'iroq tugadi"+dur,time:Date.now(),seen:false});
  endCallLocal(false);
- setTimeout(()=>{if(currentCallId)remove(callRef()).catch(()=>{});currentCallId=null;},3000);
+ setTimeout(()=>{if(cid)remove(R('webrtc','calls',cid)).catch(()=>{});},3000);
 };
 
 function endCallLocal(cleanupNode){
  clearInterval(callTim);
  auRng.pause();auRng.currentTime=0;
  if(unsICE){unsICE();unsICE=null;}
+ if(unsWC_inc){unsWC_inc();unsWC_inc=null;}
  seenICE.clear();
  if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null;}
  const rv=$('vid-remote'),lv=$('vid-local');
@@ -1016,7 +1036,11 @@ function endCallLocal(cleanupNode){
  callState='idle';
  window._incomingData=null;
  pendingCandidates=[];
- dbg('Qo\'ng\'iroq tugatildi');
+ const oldId=currentCallId;
+ currentCallId=null;
+ // Listener ni qayta yoqish (keyingi qo'ng'iroqlar uchun)
+ if(me&&them)subWebRTC();
+ dbg('Qo\'ng\'iroq tugatildi, id='+oldId);
 }
 
 window.togMute=()=>{isMuted=!isMuted;if(localStream)localStream.getAudioTracks().forEach(t=>{t.enabled=!isMuted;});$('cb-mut').textContent=isMuted?'🔇':'🎤';$('cb-mut').classList.toggle('act',isMuted);};
@@ -1384,7 +1408,7 @@ window.doLogout=async()=>{
  stopMusic();
  await set(R('presence',me),{online:false,last:serverTimestamp()});
  await set(R('typing',me),{active:false});
- [unsMsg,unsTyp,unsOnl,unsPrf,unsWC,unsICE].forEach(u=>{if(u)u();});
+ [unsMsg,unsTyp,unsOnl,unsPrf,unsWC,unsWC_inc,unsWC_ans,unsWC_end,unsICE].forEach(u=>{if(u)u();});
  endCallLocal(false);
  me=null;them=null;playlist=[];curTrack=0;currentCallId=null;
  $('i-lg').value='';$('i-pw').value='';$('i-kw').value='';
